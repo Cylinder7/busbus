@@ -979,7 +979,7 @@ MonoBehaviour:
   motorTorque: 5000
   maxSteerAngle: 30
   brakeTorque: 5000
-  maxSpeed: 25
+  maxSpeed: 500
 --- !u!54 &1596209087
 Rigidbody:
   m_ObjectHideFlags: 0

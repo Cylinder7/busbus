@@ -5050,15 +5050,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 3ae5e8d239a9ebd479eb7665340d8155, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.344
+      value: 5.33
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3ae5e8d239a9ebd479eb7665340d8155, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.47607297
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3ae5e8d239a9ebd479eb7665340d8155, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.5771027
+      value: -3.555555
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3ae5e8d239a9ebd479eb7665340d8155, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5123,11 +5123,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 20136ba86f642f8498a576bf98dd65f6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.47098202
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 20136ba86f642f8498a576bf98dd65f6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.22
+      value: 3.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 20136ba86f642f8498a576bf98dd65f6, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5183,15 +5183,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 7010b86ee6a53a144a4e6d14c103c7e0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.33944
+      value: 3.3444445
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7010b86ee6a53a144a4e6d14c103c7e0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.4753651
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7010b86ee6a53a144a4e6d14c103c7e0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.5830536
+      value: -3.5555556
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7010b86ee6a53a144a4e6d14c103c7e0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5533,7 +5533,7 @@ Transform:
   m_GameObject: {fileID: 1324217804}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.352, y: 0.511, z: -3.584}
+  m_LocalPosition: {x: 5.5, y: 0.4, z: -3.555555}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5553,7 +5553,7 @@ WheelCollider:
     spring: 35000
     damper: 4500
     targetPosition: 0.5
-  m_SuspensionDistance: 0.1
+  m_SuspensionDistance: 0.5
   m_ForceAppPointDistance: 0
   m_Mass: 100
   m_WheelDampingRate: 0.25
@@ -5632,7 +5632,7 @@ Transform:
   m_GameObject: {fileID: 1651762032}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.459, y: 0.52, z: 3.228}
+  m_LocalPosition: {x: 5.5, y: 0.4, z: 3.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5652,7 +5652,7 @@ WheelCollider:
     spring: 35000
     damper: 4500
     targetPosition: 0.5
-  m_SuspensionDistance: 0.1
+  m_SuspensionDistance: 0.5
   m_ForceAppPointDistance: 0
   m_Mass: 100
   m_WheelDampingRate: 0.25
@@ -5703,7 +5703,7 @@ Transform:
   m_GameObject: {fileID: 1763223923}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.367, y: 0.502, z: -3.557}
+  m_LocalPosition: {x: 3.22, y: 0.4, z: -3.5555556}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5723,7 +5723,7 @@ WheelCollider:
     spring: 35000
     damper: 4500
     targetPosition: 0.5
-  m_SuspensionDistance: 0.1
+  m_SuspensionDistance: 0.5
   m_ForceAppPointDistance: 0
   m_Mass: 100
   m_WheelDampingRate: 0.25
@@ -5941,8 +5941,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1792597340}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 2, z: 225.46811}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.4, z: 225.46811}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5957,7 +5957,7 @@ Transform:
   - {fileID: 1763223924}
   - {fileID: 1210027269}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1792597343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5982,7 +5982,7 @@ MonoBehaviour:
   maxSteerAngle: 30
   brakeTorque: 5000
   maxSpeed: 25
-  centerOfMassOffset: -3
+  centerOfMassOffset: -1
 --- !u!4 &1792672774 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1151388028547126963, guid: 5bb184d049844044a889b9bb96f4ee92, type: 3}
@@ -6008,15 +6008,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: df9afc502b707e04facdcd259c4515c6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.49844
+      value: 5.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: df9afc502b707e04facdcd259c4515c6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.47649896
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: df9afc502b707e04facdcd259c4515c6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.2368317
+      value: 3.2
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: df9afc502b707e04facdcd259c4515c6, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6215,7 +6215,7 @@ Transform:
   m_GameObject: {fileID: 2112608395}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.363, y: 0.492, z: 3.266}
+  m_LocalPosition: {x: 3.22, y: 0.4, z: 3.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6235,7 +6235,7 @@ WheelCollider:
     spring: 35000
     damper: 4500
     targetPosition: 0.5
-  m_SuspensionDistance: 0.1
+  m_SuspensionDistance: 0.5
   m_ForceAppPointDistance: 0
   m_Mass: 100
   m_WheelDampingRate: 0.25

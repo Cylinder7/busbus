@@ -63,9 +63,9 @@ public class BusController : MonoBehaviour
 
     private void ApplyMotor()
     {
-        // Added a minus (-) sign here to invert the direction
-        RearLeft.motorTorque = -motorInput * motorTorque;
-        RearRight.motorTorque = -motorInput * motorTorque;
+        
+        RearLeft.motorTorque = motorInput * motorTorque;
+        RearRight.motorTorque = motorInput * motorTorque;
     }
 
     private void ApplySteering()

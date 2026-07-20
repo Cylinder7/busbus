@@ -23,6 +23,8 @@ public class BusController : MonoBehaviour
     public float brakeTorque = 5000f;
     public float maxSpeed = 25f;
 
+    public float centerOfMassOffset = -2.5f;
+
     private float steerInput = 0f;
     private float motorInput = 0f;
     private Rigidbody rb;
@@ -30,7 +32,7 @@ public class BusController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.centerOfMass = new Vector3(0f, -0.5f, 0f);
+        rb.centerOfMass = new Vector3(0f, centerOfMassOffset, 0f);
     }
     
     void Start()
@@ -108,6 +110,6 @@ public class BusController : MonoBehaviour
         collider.GetWorldPose(out Vector3 pos, out Quaternion rot);
 
         wheelTransform.position = pos;
-        wheelTransform.rotation = rot * Quaternion.Euler(0f, 0f, 90f);
+        wheelTransform.rotation = rot;
     }
 }

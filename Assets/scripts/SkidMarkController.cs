@@ -4,7 +4,7 @@ public class SkidMarkController : MonoBehaviour
 {
     public WheelCollider wheelCollider; // Reference to the WheelCollider component
     private TrailRenderer skidTrail; // Reference to the TrailRenderer component
-    private float skidThreshold = 0.5f; // Threshold for detecting skidding
+    private float skidThreshold = 0.1f; // Threshold for detecting skidding
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

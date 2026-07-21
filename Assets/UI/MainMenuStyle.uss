@@ -1,54 +1,62 @@
 /* The main screen wrapper */
 .main-container {
-flex-grow: 1; 
+flex-grow: 1;
 justify-content: space-between;
-align-items: center; 
-background-color: rgba(0, 0, 0, 0.4); 
-padding-top: 10%;
-padding-bottom: 10%;
+align-items: center;
+/* FIX: Replaced unsupported radial gradient with a dark, cinematic semi-transparent color */
+background-color: rgba(15, 15, 20, 0.85);
+padding-top: 8%;
+padding-bottom: 8%;
 }
 
 /* The Title Text */
 .title-label {
-font-size: 100px;
+font-size: 110px;
 -unity-font-style: bold;
 color: rgb(255, 255, 255);
 -unity-text-align: middle-center;
-letter-spacing: 15px; 
+letter-spacing: 15px;
+/* Adding a heavy drop shadow to make it pop */
+text-shadow: 5px 5px 0px rgba(0, 0, 0, 0.9);
 }
 
 /* Wrapper just for the buttons */
 .button-container {
 width: 100%;
-align-items: center; 
+align-items: center;
 }
 
-/* Base style for all buttons */
+/* Upgraded base style for all buttons */
 .menu-button {
-width: 350px;
-height: 80px;
+width: 380px;
+height: 85px;
 font-size: 35px;
 -unity-font-style: bold;
 color: rgb(255, 255, 255);
-background-color: rgb(243, 156, 18); 
-border-radius: 15px;
-border-width: 0; 
-margin-bottom: 25px; 
-transition-duration: 0.15s; 
+/* FIX: Using a solid punchy racing orange instead of a gradient */
+background-color: rgb(243, 115, 18);
+border-radius: 12px;
+border-width: 3px;
+border-color: rgba(255, 255, 255, 0.3);
+margin-bottom: 25px;
+transition-duration: 0.2s;
+transition-timing-function: ease-out-back; /* Adds a slight bouncy feel */
+text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
-/* Hover effect for buttons */
+/* Upgraded Hover effect */
 .menu-button:hover {
-scale: 1.05 1.05; /* Makes the button slightly larger on hover */
-background-color: rgb(211, 84, 0); /* Darker orange */
+scale: 1.08 1.08;
+background-color: rgb(255, 150, 45); /* Lighter orange for hover */
+border-color: rgb(255, 255, 255); /* White glowing border on hover */
 }
 
-/* Special styling just for the quit button */
+/* Special styling for the quit button */
 .quit-button {
-background-color: rgb(192, 57, 43); /* Red */
-margin-top: 20px; /* Extra gap above the quit button */
+background-color: rgb(192, 57, 43);
+margin-top: 30px;
 }
 
 .quit-button:hover {
-background-color: rgb(150, 40, 27); /* Darker red */
+background-color: rgb(231, 76, 60);
 }

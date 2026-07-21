@@ -1,11 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/MainMenuStyle.uss?fileID=7433441132597879392&amp;guid=97245f362ee109e439c5e0aa3e1c1501&amp;type=3#MainMenuStyle"/>
-    <ui:VisualElement class="main-container">
-        <ui:Label text="BusBus" class="title-label"/>
+    <ui:VisualElement name="main-container" class="main-container">
+        <ui:Label text="BusBus" class="title-label" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
         <ui:VisualElement class="button-container">
-            <ui:Button text="START RACE" name="StartButton" class="menu-button"/>
-            <ui:Button text="GARAGE" name="GarageButton" class="menu-button"/>
-            <ui:Button text="QUIT" name="QuitButton" class="menu-button quit-button"/>
+            <ui:Button text="START RACE" name="StartButton" class="menu-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
+            <ui:Button text="GARAGE" name="GarageButton" class="menu-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
+            <ui:Button text="QUIT" name="QuitButton" class="menu-button quit-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

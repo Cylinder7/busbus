@@ -1,0 +1,160 @@
+/* The main screen wrapper for the Garage */
+.garage-container {
+flex-grow: 1;
+background-color: rgba(20, 25, 30, 0.98);
+padding: 5%;
+align-items: center;
+justify-content: space-between;
+}
+
+.header-wrapper {
+align-items: center;
+}
+
+/* Garage Title */
+.garage-title {
+font-size: 90px;
+-unity-font-style: bold;
+color: rgb(253, 187, 45);
+letter-spacing: 12px;
+text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.8);
+margin-bottom: 0px;
+}
+
+/* New Points Display */
+.points-label {
+font-size: 35px;
+-unity-font-style: bold;
+color: rgb(46, 204, 113); /* Success Green */
+text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+margin-top: -10px;
+}
+
+/* A sleek "Glassmorphism" panel */
+.stats-panel {
+width: 65%;
+background-color: rgba(255, 255, 255, 0.05);
+border-radius: 25px;
+border-width: 2px;
+border-color: rgba(255, 255, 255, 0.2);
+padding: 40px;
+align-items: stretch; /* Forces rows to take full width */
+}
+
+/* --- ROW-BASED STYLING --- */
+.stat-row {
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 25px;
+padding-bottom: 15px;
+border-bottom-width: 2px;
+border-color: rgba(255, 255, 255, 0.1);
+}
+
+.stat-name {
+font-size: 40px;
+color: rgb(200, 200, 200);
+-unity-font-style: bold;
+width: 30%;
+}
+
+.stat-value {
+font-size: 45px;
+color: white;
+-unity-font-style: bold;
+-unity-text-align: middle-center;
+text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+width: 40%;
+}
+
+/* The Upgrade Button (+) */
+.upgrade-button {
+width: 65px;
+height: 65px;
+font-size: 45px;
+-unity-font-style: bold;
+color: white;
+background-color: rgb(46, 204, 113); /* Green */
+-unity-slice-left: 0;
+-unity-slice-right: 0;
+-unity-slice-top: 0;
+-unity-slice-bottom: 0;
+border-radius: 12px;
+border-width: 2px;
+border-color: rgba(255, 255, 255, 0.4);
+transition-duration: 0.1s;
+}
+
+.upgrade-button:hover {
+scale: 1.1 1.1;
+background-color: rgb(64, 224, 208); /* Cyan hover */
+}
+
+.upgrade-button:active {
+background-color: rgb(39, 174, 96); /* Darker green on click */
+}
+
+/* --- NEW CYCLING BUTTONS (For Paint) --- */
+.cycle-container {
+flex-direction: row;
+width: 55%; /* Spans across the value and button area */
+justify-content: space-between;
+align-items: center;
+}
+
+.paint-value {
+width: 60%; /* Overrides standard value width inside the container */
+font-size: 35px; /* Slightly smaller to fit color names */
+}
+
+.cycle-button {
+width: 60px;
+height: 60px;
+font-size: 35px;
+-unity-font-style: bold;
+color: white;
+background-color: rgb(52, 152, 219); /* Blue for cosmetics */
+-unity-slice-left: 0;
+-unity-slice-right: 0;
+-unity-slice-top: 0;
+-unity-slice-bottom: 0;
+border-radius: 12px;
+border-width: 2px;
+border-color: rgba(255, 255, 255, 0.4);
+transition-duration: 0.1s;
+}
+
+.cycle-button:hover {
+scale: 1.1 1.1;
+background-color: rgb(41, 128, 185);
+}
+
+.cycle-button:active {
+background-color: rgb(31, 97, 141);
+}
+
+/* --- BACK BUTTON --- */
+.back-button {
+width: 320px;
+height: 75px;
+font-size: 30px;
+-unity-font-style: bold;
+color: white;
+background-color: rgb(127, 140, 141);
+-unity-slice-left: 0;
+-unity-slice-right: 0;
+-unity-slice-top: 0;
+-unity-slice-bottom: 0;
+border-radius: 12px;
+border-width: 3px;
+border-color: rgba(255, 255, 255, 0.2);
+transition-duration: 0.2s;
+transition-timing-function: ease-out-back;
+}
+
+.back-button:hover {
+scale: 1.05 1.05;
+background-color: rgb(149, 165, 166);
+border-color: white;
+}

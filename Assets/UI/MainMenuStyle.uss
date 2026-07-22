@@ -3,7 +3,6 @@
 flex-grow: 1;
 justify-content: space-between;
 align-items: center;
-/* FIX: Replaced unsupported radial gradient with a dark, cinematic semi-transparent color */
 background-color: rgba(15, 15, 20, 0.85);
 padding-top: 8%;
 padding-bottom: 8%;
@@ -11,12 +10,12 @@ padding-bottom: 8%;
 
 /* The Title Text */
 .title-label {
+-unity-font: url('project://database/Assets/Fonts/RacingSansOne-Regular.ttf');
+-unity-font-definition: initial;
 font-size: 110px;
--unity-font-style: bold;
 color: rgb(255, 255, 255);
 -unity-text-align: middle-center;
 letter-spacing: 15px;
-/* Adding a heavy drop shadow to make it pop */
 text-shadow: 5px 5px 0px rgba(0, 0, 0, 0.9);
 }
 
@@ -28,27 +27,36 @@ align-items: center;
 
 /* Upgraded base style for all buttons */
 .menu-button {
+-unity-font: url('project://database/Assets/Fonts/RacingSansOne-Regular.ttf');
+-unity-font-definition: initial;
 width: 380px;
 height: 85px;
-font-size: 35px;
--unity-font-style: bold;
+font-size: 40px;
 color: rgb(255, 255, 255);
-/* FIX: Using a solid punchy racing orange instead of a gradient */
 background-color: rgb(243, 115, 18);
+
+/* Fixing the Unity 9-slice artifact */
+-unity-slice-left: 0;
+-unity-slice-right: 0;
+-unity-slice-top: 0;
+-unity-slice-bottom: 0;
+
 border-radius: 12px;
 border-width: 3px;
 border-color: rgba(255, 255, 255, 0.3);
 margin-bottom: 25px;
 transition-duration: 0.2s;
-transition-timing-function: ease-out-back; /* Adds a slight bouncy feel */
+transition-timing-function: ease-out-back;
 text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+
+
 }
 
 /* Upgraded Hover effect */
 .menu-button:hover {
 scale: 1.08 1.08;
-background-color: rgb(255, 150, 45); /* Lighter orange for hover */
-border-color: rgb(255, 255, 255); /* White glowing border on hover */
+background-color: rgb(255, 150, 45);
+border-color: rgb(255, 255, 255);
 }
 
 /* Special styling for the quit button */

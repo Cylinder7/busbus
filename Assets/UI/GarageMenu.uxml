@@ -2,34 +2,31 @@
     <Style src="project://database/Assets/UI/GarageMenuStyle.uss?fileID=7433441132597879392&amp;guid=eb43f2b96ffc006438fe46821d6c96b8&amp;type=3#GarageMenuStyle"/>
     <ui:VisualElement name="garage-container" class="garage-container">
         <ui:VisualElement class="header-wrapper">
-            <ui:Label text="GARAGE" class="garage-title" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
-            <ui:Label text="UPGRADE POINTS: 5" name="PointsLabel" class="points-label" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
+            <ui:Label text="GARAGE" class="garage-title"/>
+            <ui:Label text="UPGRADE POINTS: 5" name="PointsLabel" class="points-label"/>
         </ui:VisualElement>
         <ui:VisualElement class="stats-panel">
             <ui:VisualElement class="stat-row">
-                <ui:Label text="Top Speed" class="stat-name" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
-                <ui:Label text="65 MPH" name="SpeedValue" class="stat-value" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
+                <ui:Label text="Top Speed" class="stat-name"/>
+                <ui:Label text="65 MPH" name="SpeedValue" class="stat-value"/>
                 <ui:Button text="+" name="UpgradeSpeed" class="upgrade-button"/>
             </ui:VisualElement>
             <ui:VisualElement class="stat-row">
-                <ui:Label text="Handling" class="stat-name" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
-                <ui:Label text="2 / 10" name="HandlingValue" class="stat-value" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
+                <ui:Label text="Handling" class="stat-name"/>
+                <ui:Label text="2 / 10" name="HandlingValue" class="stat-value"/>
                 <ui:Button text="+" name="UpgradeHandling" class="upgrade-button"/>
             </ui:VisualElement>
             <ui:VisualElement class="stat-row">
-                <ui:Label text="Boost" class="stat-name" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
-                <ui:Label text="1.5s" name="BoostValue" class="stat-value" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
+                <ui:Label text="Boost" class="stat-name"/>
+                <ui:Label text="1.5s" name="BoostValue" class="stat-value"/>
                 <ui:Button text="+" name="UpgradeBoost" class="upgrade-button"/>
             </ui:VisualElement>
             <ui:VisualElement class="stat-row">
-                <ui:Label text="Paint Job" class="stat-name" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
-                <ui:VisualElement class="cycle-container">
-                    <ui:Button text="&lt;" name="PrevPaint" class="cycle-button"/>
-                    <ui:Label text="City Yellow" name="PaintValue" class="stat-value paint-value" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
-                    <ui:Button text="&gt;" name="NextPaint" class="cycle-button"/>
-                </ui:VisualElement>
+                <ui:Label text="Turning" class="stat-name"/>
+                <ui:Label text="2 / 10" name="TurningValue" class="stat-value"/>
+                <ui:Button text="+" name="UpgradeTurning" class="upgrade-button"/>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Button text="BACK TO MENU" name="BackButton" class="back-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
+        <ui:Button text="BACK TO MENU" name="BackButton" class="back-button"/>
     </ui:VisualElement>
 </ui:UXML>

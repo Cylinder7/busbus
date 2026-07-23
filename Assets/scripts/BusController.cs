@@ -68,11 +68,7 @@ public class BusController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = new Vector3(0f, -2f, 0f);
-        
-        // Validate wheel colliders
         ValidateWheelColliders();
-        
-        // Store original friction curves
         StoreOriginalFriction();
     }
 

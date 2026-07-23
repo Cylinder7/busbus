@@ -1057,7 +1057,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1104,7 +1104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BusCamera
   BusRoot: {fileID: 1641603802}
   CameraTarget: {fileID: 1598017877}
-  CameraOffset: {x: 0, y: 5, z: -10}
+  CameraOffset: {x: 0, y: 5, z: -12}
   FollowSpeed: 5
   LookSpeed: 5
   BoostCameraShakeIntensity: 0.5
@@ -1754,7 +1754,7 @@ Transform:
   m_GameObject: {fileID: 846656887}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
-  m_LocalPosition: {x: 0, y: -0.28, z: -5.09}
+  m_LocalPosition: {x: 0, y: -0.79, z: -5.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1848,7 +1848,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846656887}
   serializedVersion: 8
-  lengthInSec: 5
+  lengthInSec: 3
   simulationSpeed: 5
   stopAction: 0
   cullingMode: 0
@@ -1976,7 +1976,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 2
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -2411,7 +2411,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 1000
+    maxNumParticles: 100
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -2559,7 +2559,7 @@ ParticleSystem:
     randomPositionAmount: 0
     radius:
       value: 1
-      mode: 2
+      mode: 0
       spread: 0
       speed:
         serializedVersion: 2
@@ -9013,7 +9013,7 @@ Transform:
   m_GameObject: {fileID: 1598017876}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.071, z: -5.29}
+  m_LocalPosition: {x: 0, y: 1.071, z: -8.81}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9337,11 +9337,11 @@ MonoBehaviour:
   boostCooldown: 1
   driftSteerMultiplier: 20
   tractionMultiplier: 1.5
-  boostTrail: {fileID: 0}
+  boostTrail: {fileID: 846656890}
   boostAudio: {fileID: 1641603805}
   engineAudio: {fileID: 1641603805}
-  driftSmokeL: {fileID: 0}
-  driftSmokeR: {fileID: 0}
+  driftSmokeL: {fileID: 1827530264}
+  driftSmokeR: {fileID: 1693019898}
   windAudio: {fileID: 1641603805}
   turboAudio: {fileID: 1641603805}
   wheelFL: {fileID: 315694558}
@@ -10090,7 +10090,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1693019895}
   serializedVersion: 8
-  lengthInSec: 5
+  lengthInSec: 3
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
@@ -10218,7 +10218,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 4
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -15470,7 +15470,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1827530261}
   serializedVersion: 8
-  lengthInSec: 5
+  lengthInSec: 3
   simulationSpeed: 1
   stopAction: 0
   cullingMode: 0
@@ -15598,7 +15598,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 4
       minScalar: 5
       maxCurve:
         serializedVersion: 2

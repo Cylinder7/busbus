@@ -154,31 +154,28 @@ public class BusController : MonoBehaviour
     }
 
     void HandleMotor()
-    {
-        if (!IsGrounded()) return;
+{
+    if (!IsGrounded()) return;
 
-        float motorInput = Input.GetAxis("Vertical");
-        float currentMotorForce = motorInput * motorForce;
+    float motorInput = Input.GetAxis("Vertical");
+    float currentMotorForce = motorInput * motorForce;
 
-        // Apply boost multiplier
-        if (isBoosting)
-        {
-            currentMotorForce *= boostMultiplier;
-        }
+    if (isBoosting)
+        currentMotorForce *= boostMultiplier;
 
-        // Check if braking (reverse input while moving forward)
-        bool isBraking = motorInput < 0f && speed > reverseSpeed;
+    // Braking: reverse input while moving forward at any speed
+    bool isMovingForward = Vector3.Dot(rb.linearVelocity, transform.forward) > 0.5f;
+    bool isBraking = motorInput < 0f && isMovingForward;
 
-        // Apply to rear wheels (RWD)
-        ApplyMotorToWheel(wheelColliderRL, currentMotorForce, isBraking);
-        ApplyMotorToWheel(wheelColliderRR, currentMotorForce, isBraking);
+    ApplyMotorToWheel(wheelColliderRL, currentMotorForce, isBraking);
+    ApplyMotorToWheel(wheelColliderRR, currentMotorForce, isBraking);
 
-        
-        if (!isBraking && Mathf.Abs(motorInput) > 0.01f)
-        {
-            rb.AddForce(transform.forward * currentMotorForce * Time.fixedDeltaTime, ForceMode.Acceleration);
-        }
-    }
+    // Also brake front wheels for stronger deceleration
+    if (wheelColliderFL != null)
+        wheelColliderFL.brakeTorque = isBraking ? brakeForce : 0f;
+    if (wheelColliderFR != null)
+        wheelColliderFR.brakeTorque = isBraking ? brakeForce : 0f;
+}
 
     void ApplyMotorToWheel(WheelCollider wheel, float motorTorque, bool isBraking)
     {

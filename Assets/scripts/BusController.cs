@@ -3,41 +3,52 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class BusController : MonoBehaviour
 {
-
     [Header("Movement Settings")]
-    public float motorForce;
-    public float brakeForce;
-    public float maxSpeed;
-    public float reverseSpeed;
+    public float motorForce = 3000f;
+    public float brakeForce = 5000f;
+    public float maxSpeed = 40f;
+    public float reverseSpeed = 10f;
 
     [Header("Steering Settings")]
-    public float steerAngle;
-    public float steerSpeed;
+    public float maxSteerAngle = 35f;
+    public float steerSpeed = 10f;
 
     [Header("Boost Settings")]
-    public float boostMultiplier;
-    public float boostDuration;
-    public float boostCooldown;
+    public float boostMultiplier = 1.5f;
+    public float boostDuration = 3f;
+    public float boostCooldown = 5f;
 
     [Header("Drift Settings")]
-    public float driftSteerMultiplier;
-    public float tractionMultiplier;
+    public float driftSteerMultiplier = 1.5f;
+    public float normalForwardTraction = 1f;
+    public float normalSidewaysTraction = 1f;
+    public float driftForwardTraction = 0.8f;
+    public float driftSidewaysTraction = 0.4f;
 
     [Header("Effects References")]
     public ParticleSystem boostTrail;
     public AudioSource boostAudio;
     public AudioSource engineAudio;
     public ParticleSystem driftSmokeL, driftSmokeR;
-    public AudioSource windAudio,turboAudio;
+    public AudioSource windAudio, turboAudio;
 
-    [Header("Wheel References")]
-    public Transform wheelFL;
-    public Transform wheelFR;
-    public Transform wheelRL;
-    public Transform wheelRR;
+    [Header("Wheel Colliders")]
+    public WheelCollider wheelColliderFL;
+    public WheelCollider wheelColliderFR;
+    public WheelCollider wheelColliderRL;
+    public WheelCollider wheelColliderRR;
+
+    [Header("Wheel Visual Transforms")]
+    public Transform wheelVisualFL;
+    public Transform wheelVisualFR;
+    public Transform wheelVisualRL;
+    public Transform wheelVisualRR;
 
     [Header("Camera Reference Settings")]
     public Transform cameraTarget;
+
+    [Header("Debug Settings")]
+    public bool debugMode = true;
 
     private Rigidbody rb;
     private float currentSteerAngle;
@@ -47,13 +58,44 @@ public class BusController : MonoBehaviour
     private bool isDrifting;
     private float speed;
 
+    // Store original friction values
+    private WheelFrictionCurve originalForwardFrictionRL;
+    private WheelFrictionCurve originalSidewaysFrictionRL;
+    private WheelFrictionCurve originalForwardFrictionRR;
+    private WheelFrictionCurve originalSidewaysFrictionRR;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        rb.centerOfMass = new Vector3(0f, -2f, 0f);
+        ValidateWheelColliders();
+        StoreOriginalFriction();
     }
 
+    void ValidateWheelColliders()
+    {
+        if (wheelColliderFL == null || wheelColliderFR == null || 
+            wheelColliderRL == null || wheelColliderRR == null)
+        {
+            Debug.LogError("BusController: All WheelColliders must be assigned!", this);
+            enabled = false;
+        }
+    }
 
-    // Update is called once per frame
+    void StoreOriginalFriction()
+    {
+        if (wheelColliderRL != null)
+        {
+            originalForwardFrictionRL = wheelColliderRL.forwardFriction;
+            originalSidewaysFrictionRL = wheelColliderRL.sidewaysFriction;
+        }
+        if (wheelColliderRR != null)
+        {
+            originalForwardFrictionRR = wheelColliderRR.forwardFriction;
+            originalSidewaysFrictionRR = wheelColliderRR.sidewaysFriction;
+        }
+    }
+
     void Update()
     {
         speed = rb.linearVelocity.magnitude;
@@ -70,89 +112,157 @@ public class BusController : MonoBehaviour
         LimitSpeed();
         UpdateCameraTarget();
     }
-    
+
+    void OnGUI()
+    {
+        if (!debugMode) return;
+
+        GUILayout.BeginArea(new Rect(10, 10, 350, 320), GUI.skin.box);
+
+        GUILayout.Label("=== BUS DEBUG ===");
+        GUILayout.Label("Speed: " + speed.ToString("F2") + " m/s");
+        GUILayout.Label("Speed: " + (speed * 3.6f).ToString("F1") + " km/h");
+        GUILayout.Label("Velocity: " + rb.linearVelocity.ToString("F2"));
+        GUILayout.Label("Steer Angle: " + currentSteerAngle.ToString("F1") + "°");
+        GUILayout.Label("Boosting: " + isBoosting);
+        GUILayout.Label("Drifting: " + isDrifting);
+        GUILayout.Label("Vertical Input: " + Input.GetAxis("Vertical").ToString("F2"));
+        GUILayout.Label("Horizontal Input: " + Input.GetAxis("Horizontal").ToString("F2"));
+        GUILayout.Label("Mass: " + rb.mass);
+        GUILayout.Label("RPM FL: " + (wheelColliderFL != null ? wheelColliderFL.rpm.ToString("F0") : "N/A"));
+        GUILayout.Label("RPM RR: " + (wheelColliderRR != null ? wheelColliderRR.rpm.ToString("F0") : "N/A"));
+        GUILayout.Label("Is Grounded: " + IsGrounded());
+
+        GUILayout.EndArea();
+    }
+
+    bool IsGrounded()
+    {
+        bool grounded = false;
+        if (wheelColliderFL != null && wheelColliderFL.isGrounded) grounded = true;
+        if (wheelColliderFR != null && wheelColliderFR.isGrounded) grounded = true;
+        if (wheelColliderRL != null && wheelColliderRL.isGrounded) grounded = true;
+        if (wheelColliderRR != null && wheelColliderRR.isGrounded) grounded = true;
+        return grounded;
+    }
+
     void HandleMotor()
     {
-        float motorInput = Input.GetAxis("Vertical");
-        float motorTorque = motorInput * motorForce;
+        if (!IsGrounded()) return;
 
+        float motorInput = Input.GetAxis("Vertical");
+        float currentMotorForce = motorInput * motorForce;
+
+        // Apply boost multiplier
         if (isBoosting)
         {
-            motorTorque *= boostMultiplier;
+            currentMotorForce *= boostMultiplier;
         }
 
-        if (motorInput < 0 && speed > reverseSpeed)
+        // Check if braking (reverse input while moving forward)
+        bool isBraking = motorInput < 0f && speed > reverseSpeed;
+
+        // Apply to rear wheels (RWD)
+        ApplyMotorToWheel(wheelColliderRL, currentMotorForce, isBraking);
+        ApplyMotorToWheel(wheelColliderRR, currentMotorForce, isBraking);
+    }
+
+    void ApplyMotorToWheel(WheelCollider wheel, float motorTorque, bool isBraking)
+    {
+        if (wheel == null) return;
+
+        if (isBraking)
         {
-            motorTorque = Mathf.Max(motorTorque, -brakeForce);
+            wheel.motorTorque = 0f;
+            wheel.brakeTorque = brakeForce;
         }
-        rb.AddForce(transform.forward * motorTorque, ForceMode.Force);
+        else
+        {
+            wheel.brakeTorque = 0f;
+            wheel.motorTorque = motorTorque;
+        }
     }
 
     void HandleSteering()
     {
         float steerInput = Input.GetAxis("Horizontal");
-        float targetSteer = steerInput * steerAngle;
+        float targetSteer = steerInput * maxSteerAngle;
 
-        float speedFactor = Mathf.Clamp01(1f - (speed / maxSpeed)*0.6f);
+        // Reduce steering sensitivity at high speeds
+        float speedFactor = Mathf.Clamp01(1f - (speed / maxSpeed) * 0.6f);
         targetSteer *= speedFactor;
 
+        // Increase steering angle during drift
         if (isDrifting)
         {
             targetSteer *= driftSteerMultiplier;
         }
 
+        // Smooth steering
         currentSteerAngle = Mathf.Lerp(currentSteerAngle, targetSteer, steerSpeed * Time.fixedDeltaTime);
-        rb.AddTorque(Vector3.up * currentSteerAngle, ForceMode.Force); 
-    }    
+
+        // Apply to front wheels
+        if (wheelColliderFL != null)
+        {
+            wheelColliderFL.steerAngle = currentSteerAngle;
+        }
+        if (wheelColliderFR != null)
+        {
+            wheelColliderFR.steerAngle = currentSteerAngle;
+        }
+    }
+
     void LimitSpeed()
     {
-        float currentMax =  isBoosting ? maxSpeed * boostMultiplier : maxSpeed;
+        float currentMax = isBoosting ? maxSpeed * boostMultiplier : maxSpeed;
+        
         if (rb.linearVelocity.magnitude > currentMax)
         {
             rb.linearVelocity = rb.linearVelocity.normalized * currentMax;
         }
-
     }
 
     void UpdateWheelVisuals()
     {
-        if (wheelFL == null){return;}
-        if (wheelFR == null){return;}
-        if (wheelRL == null){return;}
-        if (wheelRR == null){return;}
+        UpdateSingleWheelVisual(wheelColliderFL, wheelVisualFL);
+        UpdateSingleWheelVisual(wheelColliderFR, wheelVisualFR);
+        UpdateSingleWheelVisual(wheelColliderRL, wheelVisualRL);
+        UpdateSingleWheelVisual(wheelColliderRR, wheelVisualRR);
+    }
 
-        float distencePerFrame = speed * Time.deltaTime;
-        float wheelRadius = wheelFL.localScale.y / 2f;
-        float rotationDegrees = (distencePerFrame / (2 * Mathf.PI * wheelRadius)) * 360f;
-        Quaternion rollRotation = Quaternion.Euler(rotationDegrees, 0f, 0f);
+    void UpdateSingleWheelVisual(WheelCollider collider, Transform visual)
+    {
+        if (collider == null || visual == null) return;
 
-        wheelFL.localRotation *= rollRotation;
-        wheelFR.localRotation *= rollRotation;
-        wheelRL.localRotation *= rollRotation;
-        wheelRR.localRotation *= rollRotation;
-
-        Quaternion steerRotation = Quaternion.Euler(0f, currentSteerAngle, 0f);
-        wheelFL.localRotation = steerRotation * wheelFL.localRotation;
-        wheelFR.localRotation = steerRotation * wheelFR.localRotation;
+        Vector3 position;
+        Quaternion rotation;
+        
+        // GetWorldPose returns the wheel's world position and rotation
+        collider.GetWorldPose(out position, out rotation);
+        
+        visual.position = position;
+        visual.rotation = rotation;
     }
 
     void UpdateCameraTarget()
     {
-        if (cameraTarget == null) { return; }
-        Vector3 lookAhead = transform.forward * speed *0.3f;
+        if (cameraTarget == null) return;
+        
+        Vector3 lookAhead = transform.forward * speed * 0.3f;
         Vector3 targetPosition = transform.position + lookAhead + new Vector3(0f, 2f, -5f);
         cameraTarget.position = Vector3.Lerp(cameraTarget.position, targetPosition, Time.deltaTime * 5f);
     }
 
     void HandleBoostInput()
     {
-        if ((Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.LeftCommand)) && currentBoostCooldown <= 0f)
+        // Check for boost activation
+        if ((Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.LeftCommand)) 
+            && currentBoostCooldown <= 0f && !isBoosting)
         {
-            if (!isBoosting)
-            {
-                ActivateBoost();
-            }
+            ActivateBoost();
         }
+
+        // Handle boost duration
         if (isBoosting)
         {
             currentBoostTime -= Time.deltaTime;
@@ -163,17 +273,20 @@ public class BusController : MonoBehaviour
         }
         else
         {
+            // Handle cooldown
             if (currentBoostCooldown > 0f)
             {
                 currentBoostCooldown -= Time.deltaTime;
             }
         }
     }
+
     void ActivateBoost()
     {
         isBoosting = true;
         currentBoostTime = boostDuration;
         currentBoostCooldown = boostCooldown;
+
         if (boostTrail != null)
         {
             boostTrail.Play();
@@ -183,9 +296,11 @@ public class BusController : MonoBehaviour
             boostAudio.Play();
         }
     }
+
     void DeactivateBoost()
     {
         isBoosting = false;
+
         if (boostTrail != null)
         {
             boostTrail.Stop();
@@ -200,55 +315,121 @@ public class BusController : MonoBehaviour
     {
         isDrifting = Input.GetKey(KeyCode.Space);
 
-        if (isDrifting)
+        // Apply different traction based on drift state
+        SetDriftTraction(wheelColliderRL, isDrifting);
+        SetDriftTraction(wheelColliderRR, isDrifting);
+
+        // Handle drift smoke effects
+        HandleDriftSmoke();
+    }
+
+    void SetDriftTraction(WheelCollider wheel, bool drifting)
+    {
+        if (wheel == null) return;
+
+        WheelFrictionCurve forwardFriction = wheel.forwardFriction;
+        WheelFrictionCurve sidewaysFriction = wheel.sidewaysFriction;
+
+        if (drifting)
         {
-            Vector3 forwardVelocity = transform.forward * Vector3.Dot(rb.linearVelocity, transform.forward);
-            Vector3 rightVelocity = transform.right * Vector3.Dot(rb.linearVelocity, transform.right);
-            rb.linearVelocity = forwardVelocity + rightVelocity * tractionMultiplier;
-            if (driftSmokeL != null && driftSmokeR != null && !driftSmokeL.isEmitting && !driftSmokeR.isEmitting)
-            {
-                if (!driftSmokeL.isPlaying) driftSmokeL.Play();
-                if (!driftSmokeR.isPlaying) driftSmokeR.Play();
-            }
+            forwardFriction.stiffness = driftForwardTraction;
+            sidewaysFriction.stiffness = driftSidewaysTraction;
         }
         else
         {
-            if (driftSmokeL != null && driftSmokeR != null && (driftSmokeL.isEmitting || driftSmokeR.isEmitting))
+            forwardFriction.stiffness = normalForwardTraction;
+            sidewaysFriction.stiffness = normalSidewaysTraction;
+        }
+
+        wheel.forwardFriction = forwardFriction;
+        wheel.sidewaysFriction = sidewaysFriction;
+    }
+
+    void HandleDriftSmoke()
+    {
+        // Only emit smoke when actually sliding (speed > threshold and drifting)
+        bool shouldEmit = isDrifting && speed > 10f;
+
+        if (driftSmokeL != null)
+        {
+            if (shouldEmit && !driftSmokeL.isPlaying)
             {
-                if (driftSmokeL.isPlaying) driftSmokeL.Stop();
-                if (driftSmokeR.isPlaying) driftSmokeR.Stop();
+                driftSmokeL.Play();
+            }
+            else if (!shouldEmit && driftSmokeL.isPlaying)
+            {
+                driftSmokeL.Stop();
+            }
+        }
+
+        if (driftSmokeR != null)
+        {
+            if (shouldEmit && !driftSmokeR.isPlaying)
+            {
+                driftSmokeR.Play();
+            }
+            else if (!shouldEmit && driftSmokeR.isPlaying)
+            {
+                driftSmokeR.Stop();
             }
         }
     }
 
     void UpdateAudio()
     {
-        if (engineAudio == null) { return; }
-        float basePitch = 0.5f;
+        if (engineAudio == null) return;
+
+        float speedRatio = Mathf.Clamp01(speed / maxSpeed);
+        
+        // Calculate target pitch based on speed
+        float targetPitch = 0.5f + speedRatio * 1.2f;
+        
+        // Increase pitch during boost
         if (isBoosting)
         {
-            engineAudio.pitch*=1.5f;
+            targetPitch += 0.3f;
         }
 
-        engineAudio.pitch = Mathf.Clamp(basePitch + (speed / maxSpeed), 0.5f, 2f);
-        engineAudio.volume = Mathf.Lerp(0.5f, 1f, speed / maxSpeed);
+        // Apply pitch and volume
+        engineAudio.pitch = Mathf.Clamp(targetPitch, 0.5f, 2f);
+        engineAudio.volume = Mathf.Lerp(0.4f, 1f, speedRatio);
 
-        if(windAudio != null)
+        // Wind audio - only audible at higher speeds
+        if (windAudio != null)
         {
-            windAudio.volume = Mathf.Clamp01((speed-40f)/40f);
-            windAudio.pitch = 0.8f + (speed / maxSpeed) * 0.4f;
+            float windVolume = Mathf.Clamp01((speed - 40f) / 40f);
+            windAudio.volume = windVolume;
+            windAudio.pitch = 0.8f + speedRatio * 0.4f;
         }
-        if(turboAudio != null)
+
+        // Turbo audio - only during boost at high speed
+        if (turboAudio != null)
         {
-            bool turboRange = speed > 60f && isBoosting;
-            if(turboRange && !turboAudio.isPlaying)
+            bool shouldPlayTurbo = speed > 60f && isBoosting;
+            
+            if (shouldPlayTurbo && !turboAudio.isPlaying)
             {
                 turboAudio.Play();
             }
-            else if(!turboRange && turboAudio.isPlaying)
+            else if (!shouldPlayTurbo && turboAudio.isPlaying)
             {
                 turboAudio.Stop();
             }
+        }
+    }
+
+    // Reset friction values when disabled
+    void OnDisable()
+    {
+        if (wheelColliderRL != null)
+        {
+            wheelColliderRL.forwardFriction = originalForwardFrictionRL;
+            wheelColliderRL.sidewaysFriction = originalSidewaysFrictionRL;
+        }
+        if (wheelColliderRR != null)
+        {
+            wheelColliderRR.forwardFriction = originalForwardFrictionRR;
+            wheelColliderRR.sidewaysFriction = originalSidewaysFrictionRR;
         }
     }
 }

@@ -172,6 +172,12 @@ public class BusController : MonoBehaviour
         // Apply to rear wheels (RWD)
         ApplyMotorToWheel(wheelColliderRL, currentMotorForce, isBraking);
         ApplyMotorToWheel(wheelColliderRR, currentMotorForce, isBraking);
+
+        
+        if (!isBraking && Mathf.Abs(motorInput) > 0.01f)
+        {
+            rb.AddForce(transform.forward * currentMotorForce * Time.fixedDeltaTime, ForceMode.Acceleration);
+        }
     }
 
     void ApplyMotorToWheel(WheelCollider wheel, float motorTorque, bool isBraking)
@@ -443,8 +449,7 @@ public class BusController : MonoBehaviour
     {
         if(Input.GetKey(KeyCode.R))
         {
-            rb.transform.position = OriginalPosition;
-            rb.transform.rotation = OriginalRotation;
+            rb.transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
             rb.linearVelocity = Vector3.zero;
         }
     }

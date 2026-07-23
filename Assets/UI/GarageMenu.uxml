@@ -18,7 +18,7 @@
             </ui:VisualElement>
             <ui:VisualElement class="stat-row">
                 <ui:Label text="Boost" class="stat-name"/>
-                <ui:Label text="1.5s" name="BoostValue" class="stat-value"/>
+                <ui:Label text="3.0s" name="BoostValue" class="stat-value"/>
                 <ui:Button text="+" name="UpgradeBoost" class="upgrade-button"/>
             </ui:VisualElement>
             <ui:VisualElement class="stat-row">

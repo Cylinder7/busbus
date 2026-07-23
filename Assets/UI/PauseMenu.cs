@@ -1,37 +1,89 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 
-public class PauseMenu : MonoBehaviour
+public class PauseMenuController : MonoBehaviour
 {
-    public GameObject pauseMenuPanel;
+    [Header("UI Document")]
+    public UIDocument pauseMenuDoc;
+
+    [Header("Scene Settings")]
+    public string mainMenuSceneName = "MainMenu"; // Change this to your actual main menu scene name
+
+    private VisualElement pauseRoot;
     private bool isPaused = false;
 
-    void Update()
+    private void Start()
     {
+        if (pauseMenuDoc == null)
+        {
+            pauseMenuDoc = GetComponent<UIDocument>();
+        }
+
+        if (pauseMenuDoc == null)
+        {
+            Debug.LogError("❌ UI ERROR: No UIDocument found for the Pause Menu!");
+            return;
+        }
+
+        pauseRoot = pauseMenuDoc.rootVisualElement.Q<VisualElement>("pause-container");
+
+        if (pauseRoot == null)
+        {
+            Debug.LogError("❌ UI ERROR: Could not find 'pause-container'.");
+            return;
+        }
+
+        // Setup Buttons
+        Button resumeBtn = pauseRoot.Q<Button>("ResumeButton");
+        Button mainMenuBtn = pauseRoot.Q<Button>("MainMenuButton");
+
+        if (resumeBtn != null) resumeBtn.clicked += ResumeGame;
+        if (mainMenuBtn != null) mainMenuBtn.clicked += QuitToMainMenu;
+
+        // Hide the pause menu at the start of the game
+        pauseRoot.style.display = DisplayStyle.None;
+    }
+
+    private void Update()
+    {
+        // Listen for the Escape key on the keyboard
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (isPaused) Resume();
-            else Pause();
+            if (isPaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
         }
     }
 
-    public void Pause()
+    private void PauseGame()
     {
-        pauseMenuPanel.SetActive(true);
-        Time.timeScale = 0f;
         isPaused = true;
+        pauseRoot.style.display = DisplayStyle.Flex; // Show UI
+        Time.timeScale = 0f; // FREEZE TIME!
+        Debug.Log("Game Paused!");
     }
 
-    public void Resume()
+    private void ResumeGame()
     {
-        pauseMenuPanel.SetActive(false);
-        Time.timeScale = 1f;
         isPaused = false;
+        pauseRoot.style.display = DisplayStyle.None; // Hide UI
+        Time.timeScale = 1f; // UNFREEZE TIME!
+        Debug.Log("Game Resumed!");
     }
 
-    public void QuitToMainMenu()
+    private void QuitToMainMenu()
     {
-        Time.timeScale = 1f; // Always reset before changing scenes
-        SceneManager.LoadScene("MainMenu"); // Replace with your exact scene name
+        // CRITICAL: You MUST unfreeze time before loading a new scene, 
+        // otherwise the Main Menu will be permanently frozen!
+        Time.timeScale = 1f; 
+        
+        Debug.Log("Quitting to Main Menu...");
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }

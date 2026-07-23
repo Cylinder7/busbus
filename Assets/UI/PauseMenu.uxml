@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/PauseMenuStyle.uss?fileID=7433441132597879392&amp;guid=6dea08adbd7f13046af7a4d2135a5938&amp;type=3#PauseMenuStyle"/>
+    <ui:VisualElement name="pause-container" class="pause-overlay">
+        <ui:Label text="PAUSED" class="pause-title"/>
+        <ui:Button text="RESUME" name="ResumeButton" class="pause-button"/>
+        <ui:Button text="MAIN MENU" name="MainMenuButton" class="pause-button quit-button"/>
+    </ui:VisualElement>
+</ui:UXML>

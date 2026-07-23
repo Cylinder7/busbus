@@ -1220,13 +1220,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 667459649}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.13052616, y: 0, z: 0, w: 0.9914449}
   m_LocalPosition: {x: 0, y: 3.9, z: -108.91}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 15, y: 0, z: 0}
 --- !u!114 &667459653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1241,10 +1241,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BusCamera
   BusRoot: {fileID: 1641603802}
   CameraTarget: {fileID: 1598017877}
-  CameraOffset: {x: 0, y: 5, z: -13}
-  FollowSpeed: 5
+  CameraOffset: {x: 0, y: 5, z: -15}
+  FollowSpeed: 10
   LookSpeed: 5
   BoostCameraShakeIntensity: 0.5
+  positionSmoothing: 5
+  defaultDistance: 12
+  defaultHeight: 4
+  mouseSensitivity: 10
+  minVerticalAngle: -40
+  maxVerticalAngle: 90
 --- !u!114 &667459654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9551,7 +9557,7 @@ Rigidbody:
   m_Mass: 1500
   m_LinearDamping: 0.5
   m_AngularDamping: 2
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_CenterOfMass: {x: 0, y: -2, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
@@ -9560,7 +9566,7 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0

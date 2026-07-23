@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -58,6 +59,9 @@ public class BusController : MonoBehaviour
     private bool isDrifting;
     private float speed;
 
+    private Vector3 OriginalPosition;
+    private Quaternion OriginalRotation;
+
     // Store original friction values
     private WheelFrictionCurve originalForwardFrictionRL;
     private WheelFrictionCurve originalSidewaysFrictionRL;
@@ -70,6 +74,8 @@ public class BusController : MonoBehaviour
         rb.centerOfMass = new Vector3(0f, -2f, 0f);
         ValidateWheelColliders();
         StoreOriginalFriction();
+        OriginalPosition = rb.transform.position;
+        OriginalRotation = rb.transform.rotation;
     }
 
     void ValidateWheelColliders()
@@ -103,6 +109,7 @@ public class BusController : MonoBehaviour
         HandleDriftInput();
         UpdateWheelVisuals();
         UpdateAudio();
+        HandleReset();
     }
 
     void FixedUpdate()
@@ -430,6 +437,15 @@ public class BusController : MonoBehaviour
         {
             wheelColliderRR.forwardFriction = originalForwardFrictionRR;
             wheelColliderRR.sidewaysFriction = originalSidewaysFrictionRR;
+        }
+    }
+    void HandleReset()
+    {
+        if(Input.GetKey(KeyCode.R))
+        {
+            rb.transform.position = OriginalPosition;
+            rb.transform.rotation = OriginalRotation;
+            rb.linearVelocity = Vector3.zero;
         }
     }
 }

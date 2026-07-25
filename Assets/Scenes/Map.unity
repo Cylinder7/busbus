@@ -6046,7 +6046,7 @@ Transform:
   m_GameObject: {fileID: 1641603800}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 3.65, z: -100}
+  m_LocalPosition: {x: 10, y: 3.65, z: -100}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6194,13 +6194,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16b9079f8f7b2b0459d4c760ae56a25b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BusController
-  motorForce: 5000
-  brakeForce: 5000
-  maxSpeed: 500
+  motorForce: 1000
+  brakeForce: 3000
+  maxSpeed: 100
   reverseSpeed: 100
+  extraDriveForce: 2000
+  boostDriveForceMultiplier: 1.1
+  damageCapacity: 100
+  durability: 10
   maxSteerAngle: 35
   steerSpeed: 10
-  boostMultiplier: 13
+  boostMultiplier: 5
   boostDuration: 3
   boostCooldown: 1
   driftSteerMultiplier: 1.5
@@ -11225,6 +11229,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 20136ba86f642f8498a576bf98dd65f6, type: 3}
   m_PrefabInstance: {fileID: 1702559480}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1730111885 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6431682291150278844, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+  m_PrefabInstance: {fileID: 7437966990782852008}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1765581561
 GameObject:
   m_ObjectHideFlags: 0
@@ -16093,6 +16102,11 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!4 &2045195305 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2160068714934350274, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+  m_PrefabInstance: {fileID: 7437966990782852008}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7437966990782852008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16153,6 +16167,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7340717683297963009, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+      propertyPath: map
+      value: 
+      objectReference: {fileID: 703066027}
+    - target: {fileID: 7340717683297963009, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+      propertyPath: EndConnector
+      value: 
+      objectReference: {fileID: 2045195305}
+    - target: {fileID: 7340717683297963009, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+      propertyPath: StartConnector
+      value: 
+      objectReference: {fileID: 1730111885}
+    - target: {fileID: 7340717683297963009, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+      propertyPath: generationParent
+      value: 
+      objectReference: {fileID: 1288788525}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

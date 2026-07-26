@@ -1,23 +1,38 @@
-using System.Runtime.CompilerServices;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class BusController : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float motorForce = 3000f;
-    public float brakeForce = 5000f;
-    public float maxSpeed = 40f;
-    public float reverseSpeed = 10f;
+    public float motorForce = 2800f;
+    public float brakeForce = 4500f;
+    public float maxSpeed = 22f;
+    public float reverseSpeed = 8f;
+    public float extraDriveForce = 4000f;
+    public float boostDriveForceMultiplier = 1.1f;
+
+    [Header("Damage Settings")]
+    public float damageCapacity = 100f;
+    public float durability = 10f;
 
     [Header("Steering Settings")]
     public float maxSteerAngle = 35f;
     public float steerSpeed = 10f;
 
     [Header("Boost Settings")]
-    public float boostMultiplier = 1.5f;
+    public float boostMultiplier = 1.25f;
     public float boostDuration = 3f;
     public float boostCooldown = 5f;
+
+    [Header("Trick Settings")]
+    public float trickBoostMultiplier = 1.5f;
+    public float trickingSpeed = 1f;
+    public float trickDuration = 1f;
+    public float trickRotationSpeed = 360f;
 
     [Header("Drift Settings")]
     public float driftSteerMultiplier = 1.5f;
@@ -28,10 +43,27 @@ public class BusController : MonoBehaviour
 
     [Header("Effects References")]
     public ParticleSystem boostTrail;
+    
+    public ParticleSystem driftSmokeL, driftSmokeR;
+
+    [Header("Sounds Refrences")]
     public AudioSource boostAudio;
     public AudioSource engineAudio;
-    public ParticleSystem driftSmokeL, driftSmokeR;
-    public AudioSource windAudio, turboAudio;
+    public AudioSource turboAudio;
+    public AudioSource brakingAudio;
+    public AudioSource driftAudio;
+    public AudioSource deathAudio;
+    public AudioSource lightDamageAudio;
+    public AudioSource mediumDamageAudio;
+    public AudioSource heavyDamageAudio;
+    public AudioSource landSuccessAudio;
+    public AudioSource trick1Audio;
+    public AudioSource trick2Audio;
+    public AudioSource trick3Audio;
+    public AudioSource trick4Audio;
+    public AudioSource trick5Audio;
+    public AudioSource trick6Audio;
+    public AudioSource fullTrickAudio;
 
     [Header("Wheel Colliders")]
     public WheelCollider wheelColliderFL;
@@ -58,6 +90,13 @@ public class BusController : MonoBehaviour
     private bool isBoosting;
     private bool isDrifting;
     private float speed;
+    private float damage;
+    private readonly List<float> speedHistory = new List<float>();
+    private const int maxSpeedHistory = 20;
+    private int trickCombo = 0;
+    private bool isTricking;
+    private bool isTrickBoost;
+    private Coroutine trickCoroutine;
 
     private Vector3 OriginalPosition;
     private Quaternion OriginalRotation;
@@ -110,6 +149,7 @@ public class BusController : MonoBehaviour
         UpdateWheelVisuals();
         UpdateAudio();
         HandleReset();
+        CheckForCrash();
     }
 
     void FixedUpdate()
@@ -118,13 +158,14 @@ public class BusController : MonoBehaviour
         HandleSteering();
         LimitSpeed();
         UpdateCameraTarget();
+        HandleTricking();
     }
 
     void OnGUI()
     {
         if (!debugMode) return;
 
-        GUILayout.BeginArea(new Rect(10, 10, 350, 320), GUI.skin.box);
+        GUILayout.BeginArea(new Rect(10, 12, 350, 420), GUI.skin.box);
 
         GUILayout.Label("=== BUS DEBUG ===");
         GUILayout.Label("Speed: " + speed.ToString("F2") + " m/s");
@@ -139,6 +180,18 @@ public class BusController : MonoBehaviour
         GUILayout.Label("RPM FL: " + (wheelColliderFL != null ? wheelColliderFL.rpm.ToString("F0") : "N/A"));
         GUILayout.Label("RPM RR: " + (wheelColliderRR != null ? wheelColliderRR.rpm.ToString("F0") : "N/A"));
         GUILayout.Label("Is Grounded: " + IsGrounded());
+        GUILayout.Label("Speed History Samples: " + speedHistory.Count);
+
+        int startIndex = Mathf.Max(0, speedHistory.Count - 8);
+        for (int i = startIndex; i < speedHistory.Count; i++)
+        {
+            GUILayout.Label("[" + i + "] " + speedHistory[i].ToString("F2") + " m/s");
+        }
+
+        if (speedHistory.Count == 0)
+        {
+            GUILayout.Label("(no samples yet)");
+        }
 
         GUILayout.EndArea();
     }
@@ -161,7 +214,7 @@ public class BusController : MonoBehaviour
     float currentMotorForce = motorInput * motorForce;
 
     if (isBoosting)
-        currentMotorForce *= boostMultiplier;
+        currentMotorForce *= boostMultiplier + (trickCombo/10);
 
     // Braking: reverse input while moving forward at any speed
     bool isMovingForward = Vector3.Dot(rb.linearVelocity, transform.forward) > 0.5f;
@@ -175,6 +228,15 @@ public class BusController : MonoBehaviour
         wheelColliderFL.brakeTorque = isBraking ? brakeForce : 0f;
     if (wheelColliderFR != null)
         wheelColliderFR.brakeTorque = isBraking ? brakeForce : 0f;
+
+    if (motorInput > 0f && !isBraking)
+    {
+        float currentMaxSpeed = maxSpeed * (isBoosting ? boostMultiplier : 1f);
+        float speedFactor = Mathf.Clamp01(1f - (speed / (currentMaxSpeed * 1.05f)));
+        float forwardForce = extraDriveForce * speedFactor * (isBoosting ? boostDriveForceMultiplier : 0.7f);
+
+        rb.AddForce(transform.forward * forwardForce, ForceMode.Acceleration);
+    }
 }
 
     void ApplyMotorToWheel(WheelCollider wheel, float motorTorque, bool isBraking)
@@ -404,14 +466,6 @@ public class BusController : MonoBehaviour
         engineAudio.pitch = Mathf.Clamp(targetPitch, 0.5f, 2f);
         engineAudio.volume = Mathf.Lerp(0.4f, 1f, speedRatio);
 
-        // Wind audio - only audible at higher speeds
-        if (windAudio != null)
-        {
-            float windVolume = Mathf.Clamp01((speed - 40f) / 40f);
-            windAudio.volume = windVolume;
-            windAudio.pitch = 0.8f + speedRatio * 0.4f;
-        }
-
         // Turbo audio - only during boost at high speed
         if (turboAudio != null)
         {
@@ -449,5 +503,89 @@ public class BusController : MonoBehaviour
             rb.transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
             rb.linearVelocity = Vector3.zero;
         }
+    }
+
+    void CheckForCrash()
+    {
+        if (speedHistory.Count >= maxSpeedHistory)
+        {
+            speedHistory.RemoveAt(0);
+        }
+
+        speedHistory.Add(speed);
+    }
+
+    IEnumerator PerformTrick(Vector3 axis)
+    {
+        isTricking = true;
+        bool startedBoost = false;
+
+        if (!isBoosting)
+        {
+            ActivateBoost();
+            isTrickBoost = true;
+            startedBoost = true;
+        }
+        else
+        {
+            isTrickBoost = false;
+        }
+
+        float totalRotation = 0f;
+        while (totalRotation < 450f)
+        {
+            float deltaRotation = trickRotationSpeed * Time.deltaTime;
+            if (totalRotation + deltaRotation > 450f)
+            {
+                deltaRotation = 450f - totalRotation;
+            }
+
+            transform.Rotate(axis * deltaRotation, Space.Self);
+            totalRotation += deltaRotation;
+            yield return null;
+        }
+
+        isTricking = false;
+
+        if (isTrickBoost && startedBoost)
+        {
+            isTrickBoost = false;
+            DeactivateBoost();
+        }
+    }
+
+    void StartTrick(Vector3 axis)
+    {
+        if (isTricking) return;
+
+        if (trickCoroutine != null)
+        {
+            StopCoroutine(trickCoroutine);
+            trickCoroutine = null;
+        }
+
+        trickCoroutine = StartCoroutine(PerformTrick(axis));
+    }
+
+    void HandleTricking()
+    {
+        if(IsGrounded())
+        {
+            return;
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                // rotate bus 360 on its local z axis
+                StartTrick(Vector3.forward);
+            }
+
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                // rotate bus 360 on its local y axis
+                StartTrick(Vector3.up);
+            }
+        }        
     }
 }

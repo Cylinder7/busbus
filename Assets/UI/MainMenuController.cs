@@ -20,7 +20,7 @@ public class MainMenuController : MonoBehaviour
     private int upgradePoints = 5;
     private int topSpeed = 65;       
     private int handling = 2;        
-    private float boostTime = 1.5f;  
+    private float boostTime = 3.0f;  
     private int turning = 2;         
 
     // --- GARAGE UI ELEMENTS ---

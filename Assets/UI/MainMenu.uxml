@@ -4,7 +4,6 @@
         <ui:Label text="BusBus" class="title-label" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
         <ui:VisualElement class="button-container">
             <ui:Button text="START RACE" name="StartButton" class="menu-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
-            <ui:Button text="GARAGE" name="GarageButton" class="menu-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
             <ui:Button text="QUIT" name="QuitButton" class="menu-button quit-button" style="-unity-font-definition: url(&quot;project://database/Assets/Fonts/RacingSansOne-Regular.ttf?fileID=12800000&amp;guid=fd0566bedeeafd54fb182acf4bd5f109&amp;type=3#RacingSansOne-Regular&quot;);"/>
         </ui:VisualElement>
     </ui:VisualElement>

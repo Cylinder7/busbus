@@ -49,7 +49,7 @@ ExportedObj/
 *.sln
 *.slnx
 *.suo
-*.tmp
+/*.tmp
 *.user
 *.userprefs
 *.pidb

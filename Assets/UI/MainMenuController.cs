@@ -7,8 +7,6 @@ public class MainMenuController : MonoBehaviour
     [Header("UI Documents (Drag from Hierarchy)")]
     [Tooltip("Drag your Main Menu UI Document GameObject here")]
     public UIDocument mainMenuDoc;
-    [Tooltip("Drag your Garage UI Document GameObject here")]
-    public UIDocument garageMenuDoc;
 
     [Header("Level to Load")]
     public string raceSceneName = "Track1";
@@ -33,7 +31,7 @@ public class MainMenuController : MonoBehaviour
     private void Start()
     {
         // 1. Safety Check! Ensure both documents are assigned in the Inspector
-        if (mainMenuDoc == null || garageMenuDoc == null)
+        if (mainMenuDoc == null)
         {
             Debug.LogError("❌ UI ERROR: Missing UI Documents! Click your MainMenuController object in Unity and drag both UI Documents into the empty slots.");
             return;
@@ -41,46 +39,22 @@ public class MainMenuController : MonoBehaviour
 
         // 2. Grab the specific root containers from each document
         mainRoot = mainMenuDoc.rootVisualElement.Q<VisualElement>("main-container");
-        garageRoot = garageMenuDoc.rootVisualElement.Q<VisualElement>("garage-container");
 
-        if (mainRoot == null || garageRoot == null)
+        if (mainRoot == null)
         {
-            Debug.LogError("❌ UI ERROR: Couldn't find 'main-container' or 'garage-container'. Make sure your .uxml files have those names assigned!");
+            Debug.LogError("❌ UI ERROR: Couldn't find 'main-container' in the Main Menu UI Document. Make sure your .uxml file has that name assigned!");
             return;
         }
 
         // --- MAIN MENU SETUP ---
         Button startBtn = mainRoot.Q<Button>("StartButton");
-        Button garageBtn = mainRoot.Q<Button>("GarageButton");
         Button quitBtn = mainRoot.Q<Button>("QuitButton");
 
         if (startBtn != null) startBtn.clicked += StartRace;
-        if (garageBtn != null) garageBtn.clicked += OpenGarage;
         if (quitBtn != null) quitBtn.clicked += QuitGame;
 
-        // --- GARAGE MENU SETUP ---
-        Button backBtn = garageRoot.Q<Button>("BackButton");
-        if (backBtn != null) backBtn.clicked += CloseGarage;
-
-        pointsLabel = garageRoot.Q<Label>("PointsLabel");
-        speedValueLabel = garageRoot.Q<Label>("SpeedValue");
-        handlingValueLabel = garageRoot.Q<Label>("HandlingValue");
-        boostValueLabel = garageRoot.Q<Label>("BoostValue");
-        turningValueLabel = garageRoot.Q<Label>("TurningValue"); 
-
-        Button upgradeSpeedBtn = garageRoot.Q<Button>("UpgradeSpeed");
-        Button upgradeHandlingBtn = garageRoot.Q<Button>("UpgradeHandling");
-        Button upgradeBoostBtn = garageRoot.Q<Button>("UpgradeBoost");
-        Button upgradeTurningBtn = garageRoot.Q<Button>("UpgradeTurning"); 
-        
-        if (upgradeSpeedBtn != null) upgradeSpeedBtn.clicked += UpgradeSpeed;
-        if (upgradeHandlingBtn != null) upgradeHandlingBtn.clicked += UpgradeHandling;
-        if (upgradeBoostBtn != null) upgradeBoostBtn.clicked += UpgradeBoost;
-        if (upgradeTurningBtn != null) upgradeTurningBtn.clicked += UpgradeTurning; 
-        
         // Initialize starting views: Show Main, Hide Garage
         mainRoot.style.display = DisplayStyle.Flex;
-        garageRoot.style.display = DisplayStyle.None;
 
         UpdateGarageUI();
         Debug.Log("✅ UI successfully linked and ready!");

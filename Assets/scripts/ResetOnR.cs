@@ -57,23 +57,28 @@ public class ResetOnR : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            obj.position = initialPosition;
-            obj.rotation = initialRotation;
-
             Rigidbody rootRigidbody = obj.GetComponent<Rigidbody>();
             if (rootRigidbody != null)
             {
-                rootRigidbody.linearVelocity = initialVelocity;
-                rootRigidbody.angularVelocity = initialAngularVelocity;
+                rootRigidbody.position = initialPosition;
+                rootRigidbody.rotation = initialRotation;
+                rootRigidbody.linearVelocity = Vector3.zero;
+                rootRigidbody.angularVelocity = Vector3.zero;
+                rootRigidbody.Sleep();
+            }
+            else
+            {
+                obj.position = initialPosition;
+                obj.rotation = initialRotation;
             }
 
             for (int i = 0; i < rigidbodies.Length; i++)
             {
                 Rigidbody rb = rigidbodies[i];
-                rb.transform.position = initialBodyPositions[i];
-                rb.transform.rotation = initialBodyRotations[i];
-                rb.linearVelocity = initialBodyVelocities[i];
-                rb.angularVelocity = initialBodyAngularVelocities[i];
+                rb.position = initialBodyPositions[i];
+                rb.rotation = initialBodyRotations[i];
+                rb.linearVelocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
                 rb.Sleep();
             }
         }

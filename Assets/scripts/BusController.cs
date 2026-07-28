@@ -94,9 +94,12 @@ public class BusController : MonoBehaviour
     private readonly List<float> speedHistory = new List<float>();
     private const int maxSpeedHistory = 20;
     private int trickCombo = 0;
+    private float trickComboTimeWindow = 3f;
+    private float trickComboCountdown = 0f;
     private bool isTricking;
     private bool isTrickBoost;
     private Coroutine trickCoroutine;
+    private float currentTrickRotation = 0f;
 
     private Vector3 OriginalPosition;
     private Quaternion OriginalRotation;
@@ -106,6 +109,8 @@ public class BusController : MonoBehaviour
     private WheelFrictionCurve originalSidewaysFrictionRL;
     private WheelFrictionCurve originalForwardFrictionRR;
     private WheelFrictionCurve originalSidewaysFrictionRR;
+    
+    private readonly List<AudioSource> trickComboSounds = new List<AudioSource>();
 
     void Awake()
     {
@@ -115,6 +120,19 @@ public class BusController : MonoBehaviour
         StoreOriginalFriction();
         OriginalPosition = rb.transform.position;
         OriginalRotation = rb.transform.rotation;
+        InitializeTrickComboSounds();
+    }
+
+    void InitializeTrickComboSounds()
+    {
+        trickComboSounds.Clear();
+        trickComboSounds.Add(trick1Audio);
+        trickComboSounds.Add(trick2Audio);
+        trickComboSounds.Add(trick3Audio);
+        trickComboSounds.Add(trick4Audio);
+        trickComboSounds.Add(trick5Audio);
+        trickComboSounds.Add(trick6Audio);
+        trickComboSounds.Add(fullTrickAudio);
     }
 
     void ValidateWheelColliders()
@@ -146,10 +164,23 @@ public class BusController : MonoBehaviour
         speed = rb.linearVelocity.magnitude;
         HandleBoostInput();
         HandleDriftInput();
+        HandleTricking();
+        UpdateTrickComboCountdown();
         UpdateWheelVisuals();
         UpdateAudio();
-        HandleReset();
         CheckForCrash();
+    }
+
+    void UpdateTrickComboCountdown()
+    {
+        if (trickCombo <= 0) return;
+
+        trickComboCountdown -= Time.deltaTime;
+        if (trickComboCountdown <= 0f)
+        {
+            trickCombo = 0;
+            trickComboCountdown = 0f;
+        }
     }
 
     void FixedUpdate()
@@ -158,14 +189,13 @@ public class BusController : MonoBehaviour
         HandleSteering();
         LimitSpeed();
         UpdateCameraTarget();
-        HandleTricking();
     }
 
     void OnGUI()
     {
         if (!debugMode) return;
 
-        GUILayout.BeginArea(new Rect(10, 12, 350, 420), GUI.skin.box);
+        GUILayout.BeginArea(new Rect(10, 12, 350, 460), GUI.skin.box);
 
         GUILayout.Label("=== BUS DEBUG ===");
         GUILayout.Label("Speed: " + speed.ToString("F2") + " m/s");
@@ -180,6 +210,10 @@ public class BusController : MonoBehaviour
         GUILayout.Label("RPM FL: " + (wheelColliderFL != null ? wheelColliderFL.rpm.ToString("F0") : "N/A"));
         GUILayout.Label("RPM RR: " + (wheelColliderRR != null ? wheelColliderRR.rpm.ToString("F0") : "N/A"));
         GUILayout.Label("Is Grounded: " + IsGrounded());
+        GUILayout.Label("Tricking: " + isTricking);
+        GUILayout.Label("Trick Rotation: " + currentTrickRotation.ToString("F1") + "°");
+        GUILayout.Label("Trick Combo: " + trickCombo);
+        GUILayout.Label("Combo Timer: " + trickComboCountdown.ToString("F1") + "s");
         GUILayout.Label("Speed History Samples: " + speedHistory.Count);
 
         int startIndex = Mathf.Max(0, speedHistory.Count - 8);
@@ -214,8 +248,7 @@ public class BusController : MonoBehaviour
     float currentMotorForce = motorInput * motorForce;
 
     if (isBoosting)
-        currentMotorForce *= boostMultiplier + (trickCombo/10);
-
+            currentMotorForce *= boostMultiplier + (trickCombo / 10f);
     // Braking: reverse input while moving forward at any speed
     bool isMovingForward = Vector3.Dot(rb.linearVelocity, transform.forward) > 0.5f;
     bool isBraking = motorInput < 0f && isMovingForward;
@@ -496,14 +529,6 @@ public class BusController : MonoBehaviour
             wheelColliderRR.sidewaysFriction = originalSidewaysFrictionRR;
         }
     }
-    void HandleReset()
-    {
-        if(Input.GetKey(KeyCode.R))
-        {
-            rb.transform.SetPositionAndRotation(OriginalPosition, OriginalRotation);
-            rb.linearVelocity = Vector3.zero;
-        }
-    }
 
     void CheckForCrash()
     {
@@ -531,27 +556,59 @@ public class BusController : MonoBehaviour
             isTrickBoost = false;
         }
 
-        float totalRotation = 0f;
-        while (totalRotation < 450f)
+        currentTrickRotation = 0f;
+        while (currentTrickRotation < 360f - 0.001f)
         {
             float deltaRotation = trickRotationSpeed * Time.deltaTime;
-            if (totalRotation + deltaRotation > 450f)
+            float rotationRemaining = 360f - currentTrickRotation;
+            if (deltaRotation > rotationRemaining)
             {
-                deltaRotation = 450f - totalRotation;
+                deltaRotation = rotationRemaining;
             }
 
             transform.Rotate(axis * deltaRotation, Space.Self);
-            totalRotation += deltaRotation;
+            currentTrickRotation += deltaRotation;
             yield return null;
         }
 
+        currentTrickRotation = 360f;
+
         isTricking = false;
+
+        if (trickComboCountdown > 0f)
+        {
+            trickCombo++;
+        }
+        else
+        {
+            trickCombo = 1;
+        }
+
+        trickCombo = Mathf.Clamp(trickCombo, 1, trickComboSounds.Count);
+        trickComboCountdown = trickComboTimeWindow;
+        PlayTrickComboSound(trickCombo);
 
         if (isTrickBoost && startedBoost)
         {
             isTrickBoost = false;
             DeactivateBoost();
         }
+    }
+
+    void PlayTrickComboSound(int comboCount)
+    {
+        if (trickComboSounds.Count == 0) return;
+
+        int index = Mathf.Clamp(comboCount - 1, 0, trickComboSounds.Count - 1);
+        AudioSource audioSource = trickComboSounds[index];
+        if (audioSource == null) return;
+
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
+
+        audioSource.Play();
     }
 
     void StartTrick(Vector3 axis)

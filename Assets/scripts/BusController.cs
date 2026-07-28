@@ -169,6 +169,17 @@ public class BusController : MonoBehaviour
         UpdateWheelVisuals();
         UpdateAudio();
         CheckForCrash();
+        HandleReset();
+    }
+
+    void HandleReset()
+    {
+        if(Input.GetKeyUp(KeyCode.R))
+        {
+            rb.linearVelocity =Vector3.zero;
+            rb.transform.position = OriginalPosition;
+            rb.transform.rotation = OriginalRotation;
+        }
     }
 
     void UpdateTrickComboCountdown()

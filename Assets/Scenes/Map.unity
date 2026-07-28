@@ -6458,7 +6458,6 @@ GameObject:
   - component: {fileID: 1641603807}
   - component: {fileID: 1641603823}
   - component: {fileID: 1641603822}
-  - component: {fileID: 1641603824}
   m_Layer: 0
   m_Name: Bus
   m_TagString: Untagged
@@ -8254,19 +8253,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1641603824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1641603800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bde663fc52a17c343830be275f053e6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ResetOnR
-  obj: {fileID: 1641603802}
 --- !u!1 &1668804510 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5bb184d049844044a889b9bb96f4ee92, type: 3}

@@ -9,10 +9,27 @@ public class WinOnTouchWinWall : MonoBehaviour
 
     void Awake()
     {
-        // Note: Make sure textComponent is assigned in the Inspector 
-        // or attached to THIS same GameObject if using GetComponent.
         if (textComponent == null)
+        {
             textComponent = GetComponent<TextMeshProUGUI>();
+            if (textComponent == null)
+            {
+                textComponent = GetComponentInChildren<TextMeshProUGUI>(true);
+            }
+        }
+
+        if (canvasGroup == null)
+        {
+            canvasGroup = GetComponent<CanvasGroup>();
+            if (canvasGroup == null)
+            {
+                canvasGroup = GetComponentInChildren<CanvasGroup>(true);
+            }
+            if (canvasGroup == null)
+            {
+                canvasGroup = GetComponentInParent<CanvasGroup>();
+            }
+        }
     }
 
     void Start()
@@ -28,26 +45,57 @@ public class WinOnTouchWinWall : MonoBehaviour
         }
     }
 
-    // NEW METHOD: Call this from other scripts to set the text
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Bus"))
+        {
+            ShowUI();
+        }
+    }
+
     public void SetWinText(string newText)
     {
         if (textComponent != null)
         {
             textComponent.text = newText;
         }
+        else
+        {
+            Debug.LogWarning("WinOnTouchWinWall: No TextMeshProUGUI found. Make sure the text is on this object or one of its children.", this);
+        }
     }
 
     public void ShowUI()
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.interactable = true;
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.interactable = true;
+        }
+
+        if (textComponent != null)
+        {
+            var textColor = textComponent.color;
+            textColor.a = 1f;
+            textComponent.color = textColor;
+        }
     }
 
     public void HideUI()
     {
-        canvasGroup.alpha = 0f;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }
+
+        if (textComponent != null)
+        {
+            var textColor = textComponent.color;
+            textColor.a = 0f;
+            textComponent.color = textColor;
+        }
     }
 }

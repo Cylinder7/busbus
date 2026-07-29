@@ -6,6 +6,7 @@ public class GenerateMap : MonoBehaviour
     public Transform map;
     public Transform StartConnector;
     public Transform EndConnector;
+    public Transform EndWall;
 
     [Header("Generation")]
     public int duplicates = 10;
@@ -60,6 +61,14 @@ public class GenerateMap : MonoBehaviour
 
             previousPiece = piece;
             previousEndPosition = endConnector.position;
+        }
+
+        if (EndWall != null && previousPiece != null)
+        {
+            Transform endWallInstance = Instantiate(EndWall, parentTransform, false);
+            endWallInstance.name = EndWall.name + "_final";
+            endWallInstance.position = previousEndPosition;
+            endWallInstance.rotation = previousPiece.rotation;
         }
     }
 

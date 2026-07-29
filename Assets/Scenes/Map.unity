@@ -8990,7 +8990,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Score: '
+  m_text: 'Score: 0 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -19041,12 +19041,12 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 1, z: 0}
+  m_Center: {x: 0, y: 0, z: 0.50000006}
 --- !u!23 &2062051748
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -19072,7 +19072,7 @@ MeshRenderer:
   m_RenderingLayerMask: 254
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 27a2b7d94c3547443a300219cc88f1a3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -19113,8 +19113,8 @@ Transform:
   m_GameObject: {fileID: 2062051746}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5.04, z: -200}
-  m_LocalScale: {x: 36.33606, y: 9.219176, z: 0.4614664}
+  m_LocalPosition: {x: 0, y: 7.61, z: -20430}
+  m_LocalScale: {x: 36.33606, y: 17.146746, z: 0.4614664}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -19320,6 +19320,14 @@ PrefabInstance:
       propertyPath: map
       value: 
       objectReference: {fileID: 703066027}
+    - target: {fileID: 7340717683297963009, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+      propertyPath: EndWall
+      value: 
+      objectReference: {fileID: 2062051750}
+    - target: {fileID: 7340717683297963009, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
+      propertyPath: duplicates
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 7340717683297963009, guid: 1da3f6a8a5ff1644299261d70227ee4e, type: 3}
       propertyPath: EndConnector
       value: 

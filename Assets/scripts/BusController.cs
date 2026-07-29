@@ -134,6 +134,11 @@ public class BusController : MonoBehaviour
         OriginalPosition = rb.transform.position;
         OriginalRotation = rb.transform.rotation;
         InitializeTrickComboSounds();
+
+        if (winUI == null)
+        {
+            winUI = FindAnyObjectByType<WinOnTouchWinWall>();
+        }
     }
 
     void InitializeTrickComboSounds()
@@ -189,6 +194,7 @@ public class BusController : MonoBehaviour
         UpdateWheelVisuals();
         UpdateAudio();
         HandleReset();
+        SendScoreToUI();
     }
 
     void HandleReset()
@@ -606,7 +612,6 @@ public class BusController : MonoBehaviour
             DeactivateBoost();
             trickScore += trickCombo*10;
             trickScore = Math.Floor(trickScore);
-            winUI.SetWinText("Score: " + trickScore.ToString() + "!");
         }
     }
 
@@ -657,5 +662,16 @@ public class BusController : MonoBehaviour
                 StartTrick(Vector3.up);
             }
         }        
+    }
+    void SendScoreToUI()
+    {
+        if (winUI != null)
+            {
+                winUI.SetWinText("Score: " + trickScore.ToString() + "!");
+            }
+            else
+            {
+                Debug.LogWarning("BusController: Win UI reference is missing.", this);
+            }
     }
 }

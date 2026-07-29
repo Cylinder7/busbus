@@ -92,8 +92,6 @@ public class BusController : MonoBehaviour
     private float damage;
     private readonly List<float> speedHistory = new List<float>();
     private const int maxSpeedHistory = 20;
-
-    // Adjusted Collision Thresholds (Based on physical impact force)
     private const float minCrashForceThreshold = 1500f;    // Ignore small touches/bumps
     private const float mediumCrashForceThreshold = 4500f; // Threshold for medium impact
     private const float heavyCrashForceThreshold = 9000f;  // Threshold for heavy impact
@@ -483,7 +481,6 @@ public class BusController : MonoBehaviour
         }
     }
 
-    // --- ACCURATE COLLISION LOGIC ---
     void OnCollisionEnter(Collision collision)
     {
         if (collision == null || impactCooldownTimer > 0f) return;
@@ -495,7 +492,7 @@ public class BusController : MonoBehaviour
         if (impactForce < minCrashForceThreshold) return;
 
         impactCooldownTimer = impactCooldown;
-        PlayImpactSound(impactForce);
+        //PlayImpactSound(impactForce);
     }
 
     void PlayImpactSound(float force)

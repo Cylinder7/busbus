@@ -82,12 +82,16 @@ public class BusController : MonoBehaviour
     [Header("Debug Settings")]
     public bool debugMode = true;
 
+    [Header("other")]
+    public WinOnTouchWinWall winUI;
+
     private Rigidbody rb;
     private float currentSteerAngle;
     private float currentBoostTime;
     private float currentBoostCooldown;
     private bool isBoosting;
     private bool isDrifting;
+    private bool wasAirborne;
     private float speed;
     private float damage;
     private readonly List<float> speedHistory = new List<float>();
@@ -115,6 +119,9 @@ public class BusController : MonoBehaviour
     private WheelFrictionCurve originalSidewaysFrictionRR;
     
     private readonly List<AudioSource> trickComboSounds = new List<AudioSource>();
+
+    private Double trickScore =0f;
+    private const float MPS_TO_MPH = 2.23694f;
 
     void Awake()
     {
@@ -169,6 +176,12 @@ public class BusController : MonoBehaviour
     {
         speed = rb.linearVelocity.magnitude;
         impactCooldownTimer = Mathf.Max(0f, impactCooldownTimer - Time.deltaTime);
+
+        if (!IsGrounded())
+        {
+            wasAirborne = true;
+        }
+
         HandleBoostInput();
         HandleDriftInput();
         HandleTricking();
@@ -186,6 +199,9 @@ public class BusController : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
             rb.transform.position = OriginalPosition;
             rb.transform.rotation = OriginalRotation;
+            trickCombo=0;
+            trickScore = 0f;
+            winUI.HideUI();
         }
     }
 
@@ -211,6 +227,9 @@ public class BusController : MonoBehaviour
 
     void OnGUI()
     {
+        GUILayout.BeginArea(new Rect(500,12,150,60),GUI.skin.box);
+        GUILayout.Label("Score: " + trickScore + "   " + Mathf.FloorToInt(speed*MPS_TO_MPH) + " mph");
+        GUILayout.EndArea();
         if (!debugMode) return;
 
         GUILayout.BeginArea(new Rect(10, 12, 350, 460), GUI.skin.box);
@@ -224,15 +243,16 @@ public class BusController : MonoBehaviour
         GUILayout.Label("Drifting: " + isDrifting);
         GUILayout.Label("Vertical Input: " + Input.GetAxis("Vertical").ToString("F2"));
         GUILayout.Label("Horizontal Input: " + Input.GetAxis("Horizontal").ToString("F2"));
-        GUILayout.Label("Mass: " + rb.mass);
-        GUILayout.Label("RPM FL: " + (wheelColliderFL != null ? wheelColliderFL.rpm.ToString("F0") : "N/A"));
-        GUILayout.Label("RPM RR: " + (wheelColliderRR != null ? wheelColliderRR.rpm.ToString("F0") : "N/A"));
         GUILayout.Label("Is Grounded: " + IsGrounded());
         GUILayout.Label("Tricking: " + isTricking);
         GUILayout.Label("Trick Rotation: " + currentTrickRotation.ToString("F1") + "°");
         GUILayout.Label("Trick Combo: " + trickCombo);
         GUILayout.Label("Combo Timer: " + trickComboCountdown.ToString("F1") + "s");
+        GUILayout.Label("Score: " + trickScore);
 
+        GUILayout.EndArea();
+        GUILayout.BeginArea(new Rect(10,12,50,30),GUI.skin.box);
+        GUILayout.Label("Score:" + trickScore);
         GUILayout.EndArea();
     }
 
@@ -483,16 +503,25 @@ public class BusController : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision == null || impactCooldownTimer > 0f) return;
+        if (!collision.gameObject.CompareTag("ground")) return;
 
-        // Calculate impact force using collision impulse
-        float impactForce = collision.impulse.magnitude / Time.fixedDeltaTime;
+        if (wasAirborne)
+        {
+            bool isUpright = Vector3.Dot(transform.up, Vector3.up) > 0.95f;
+            bool isLandingSlow = Mathf.Abs(rb.linearVelocity.y) < 4f;
 
-        // Ignore minor touches, driving over bumps, and soft landings
-        if (impactForce < minCrashForceThreshold) return;
+            if (isUpright && isLandingSlow)
+            {
+                if (landSuccessAudio != null)
+                {
+                    landSuccessAudio.Play();
+                }
+                trickScore*=2;
+                Debug.Log("Perfect landing!");
+            }
+        }
 
-        impactCooldownTimer = impactCooldown;
-        //PlayImpactSound(impactForce);
+        wasAirborne = false;
     }
 
     void PlayImpactSound(float force)
@@ -550,6 +579,7 @@ public class BusController : MonoBehaviour
 
             transform.Rotate(axis * deltaRotation, Space.Self);
             currentTrickRotation += deltaRotation;
+            trickScore++;
             yield return null;
         }
 
@@ -567,12 +597,16 @@ public class BusController : MonoBehaviour
 
         trickCombo = Mathf.Clamp(trickCombo, 1, trickComboSounds.Count);
         trickComboCountdown = trickComboTimeWindow;
+        
         PlayTrickComboSound(trickCombo);
 
         if (isTrickBoost && startedBoost)
         {
             isTrickBoost = false;
             DeactivateBoost();
+            trickScore += trickCombo*10;
+            trickScore = Math.Floor(trickScore);
+            winUI.SetWinText("Score: " + trickScore.ToString() + "!");
         }
     }
 

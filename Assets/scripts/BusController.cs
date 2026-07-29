@@ -43,10 +43,9 @@ public class BusController : MonoBehaviour
 
     [Header("Effects References")]
     public ParticleSystem boostTrail;
-    
     public ParticleSystem driftSmokeL, driftSmokeR;
 
-    [Header("Sounds Refrences")]
+    [Header("Sounds References")]
     public AudioSource boostAudio;
     public AudioSource engineAudio;
     public AudioSource turboAudio;
@@ -93,6 +92,14 @@ public class BusController : MonoBehaviour
     private float damage;
     private readonly List<float> speedHistory = new List<float>();
     private const int maxSpeedHistory = 20;
+
+    // Adjusted Collision Thresholds (Based on physical impact force)
+    private const float minCrashForceThreshold = 1500f;    // Ignore small touches/bumps
+    private const float mediumCrashForceThreshold = 4500f; // Threshold for medium impact
+    private const float heavyCrashForceThreshold = 9000f;  // Threshold for heavy impact
+    private const float impactCooldown = 0.25f;
+    private float impactCooldownTimer;
+
     private int trickCombo = 0;
     private float trickComboTimeWindow = 3f;
     private float trickComboCountdown = 0f;
@@ -104,7 +111,6 @@ public class BusController : MonoBehaviour
     private Vector3 OriginalPosition;
     private Quaternion OriginalRotation;
 
-    // Store original friction values
     private WheelFrictionCurve originalForwardFrictionRL;
     private WheelFrictionCurve originalSidewaysFrictionRL;
     private WheelFrictionCurve originalForwardFrictionRR;
@@ -116,6 +122,8 @@ public class BusController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = new Vector3(0f, -2f, 0f);
+        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
         ValidateWheelColliders();
         StoreOriginalFriction();
         OriginalPosition = rb.transform.position;
@@ -162,21 +170,22 @@ public class BusController : MonoBehaviour
     void Update()
     {
         speed = rb.linearVelocity.magnitude;
+        impactCooldownTimer = Mathf.Max(0f, impactCooldownTimer - Time.deltaTime);
         HandleBoostInput();
         HandleDriftInput();
         HandleTricking();
         UpdateTrickComboCountdown();
         UpdateWheelVisuals();
         UpdateAudio();
-        CheckForCrash();
         HandleReset();
     }
 
     void HandleReset()
     {
-        if(Input.GetKeyUp(KeyCode.R))
+        if (Input.GetKeyUp(KeyCode.R))
         {
-            rb.linearVelocity =Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             rb.transform.position = OriginalPosition;
             rb.transform.rotation = OriginalRotation;
         }
@@ -225,18 +234,6 @@ public class BusController : MonoBehaviour
         GUILayout.Label("Trick Rotation: " + currentTrickRotation.ToString("F1") + "°");
         GUILayout.Label("Trick Combo: " + trickCombo);
         GUILayout.Label("Combo Timer: " + trickComboCountdown.ToString("F1") + "s");
-        GUILayout.Label("Speed History Samples: " + speedHistory.Count);
-
-        int startIndex = Mathf.Max(0, speedHistory.Count - 8);
-        for (int i = startIndex; i < speedHistory.Count; i++)
-        {
-            GUILayout.Label("[" + i + "] " + speedHistory[i].ToString("F2") + " m/s");
-        }
-
-        if (speedHistory.Count == 0)
-        {
-            GUILayout.Label("(no samples yet)");
-        }
 
         GUILayout.EndArea();
     }
@@ -252,36 +249,35 @@ public class BusController : MonoBehaviour
     }
 
     void HandleMotor()
-{
-    if (!IsGrounded()) return;
-
-    float motorInput = Input.GetAxis("Vertical");
-    float currentMotorForce = motorInput * motorForce;
-
-    if (isBoosting)
-            currentMotorForce *= boostMultiplier + (trickCombo / 10f);
-    // Braking: reverse input while moving forward at any speed
-    bool isMovingForward = Vector3.Dot(rb.linearVelocity, transform.forward) > 0.5f;
-    bool isBraking = motorInput < 0f && isMovingForward;
-
-    ApplyMotorToWheel(wheelColliderRL, currentMotorForce, isBraking);
-    ApplyMotorToWheel(wheelColliderRR, currentMotorForce, isBraking);
-
-    // Also brake front wheels for stronger deceleration
-    if (wheelColliderFL != null)
-        wheelColliderFL.brakeTorque = isBraking ? brakeForce : 0f;
-    if (wheelColliderFR != null)
-        wheelColliderFR.brakeTorque = isBraking ? brakeForce : 0f;
-
-    if (motorInput > 0f && !isBraking)
     {
-        float currentMaxSpeed = maxSpeed * (isBoosting ? boostMultiplier : 1f);
-        float speedFactor = Mathf.Clamp01(1f - (speed / (currentMaxSpeed * 1.05f)));
-        float forwardForce = extraDriveForce * speedFactor * (isBoosting ? boostDriveForceMultiplier : 0.7f);
+        if (!IsGrounded()) return;
 
-        rb.AddForce(transform.forward * forwardForce, ForceMode.Acceleration);
+        float motorInput = Input.GetAxis("Vertical");
+        float currentMotorForce = motorInput * motorForce;
+
+        if (isBoosting)
+            currentMotorForce *= boostMultiplier + (trickCombo / 10f);
+
+        bool isMovingForward = Vector3.Dot(rb.linearVelocity, transform.forward) > 0.5f;
+        bool isBraking = motorInput < 0f && isMovingForward;
+
+        ApplyMotorToWheel(wheelColliderRL, currentMotorForce, isBraking);
+        ApplyMotorToWheel(wheelColliderRR, currentMotorForce, isBraking);
+
+        if (wheelColliderFL != null)
+            wheelColliderFL.brakeTorque = isBraking ? brakeForce : 0f;
+        if (wheelColliderFR != null)
+            wheelColliderFR.brakeTorque = isBraking ? brakeForce : 0f;
+
+        if (motorInput > 0f && !isBraking)
+        {
+            float currentMaxSpeed = maxSpeed * (isBoosting ? boostMultiplier : 1f);
+            float speedFactor = Mathf.Clamp01(1f - (speed / (currentMaxSpeed * 1.05f)));
+            float forwardForce = extraDriveForce * speedFactor * (isBoosting ? boostDriveForceMultiplier : 0.7f);
+
+            rb.AddForce(transform.forward * forwardForce, ForceMode.Acceleration);
+        }
     }
-}
 
     void ApplyMotorToWheel(WheelCollider wheel, float motorTorque, bool isBraking)
     {
@@ -304,28 +300,18 @@ public class BusController : MonoBehaviour
         float steerInput = Input.GetAxis("Horizontal");
         float targetSteer = steerInput * maxSteerAngle;
 
-        // Reduce steering sensitivity at high speeds
         float speedFactor = Mathf.Clamp01(1f - (speed / maxSpeed) * 0.6f);
         targetSteer *= speedFactor;
 
-        // Increase steering angle during drift
         if (isDrifting)
         {
             targetSteer *= driftSteerMultiplier;
         }
 
-        // Smooth steering
         currentSteerAngle = Mathf.Lerp(currentSteerAngle, targetSteer, steerSpeed * Time.fixedDeltaTime);
 
-        // Apply to front wheels
-        if (wheelColliderFL != null)
-        {
-            wheelColliderFL.steerAngle = currentSteerAngle;
-        }
-        if (wheelColliderFR != null)
-        {
-            wheelColliderFR.steerAngle = currentSteerAngle;
-        }
+        if (wheelColliderFL != null) wheelColliderFL.steerAngle = currentSteerAngle;
+        if (wheelColliderFR != null) wheelColliderFR.steerAngle = currentSteerAngle;
     }
 
     void LimitSpeed()
@@ -352,8 +338,6 @@ public class BusController : MonoBehaviour
 
         Vector3 position;
         Quaternion rotation;
-        
-        // GetWorldPose returns the wheel's world position and rotation
         collider.GetWorldPose(out position, out rotation);
         
         visual.position = position;
@@ -371,14 +355,12 @@ public class BusController : MonoBehaviour
 
     void HandleBoostInput()
     {
-        // Check for boost activation
         if ((Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.LeftCommand)) 
             && currentBoostCooldown <= 0f && !isBoosting)
         {
             ActivateBoost();
         }
 
-        // Handle boost duration
         if (isBoosting)
         {
             currentBoostTime -= Time.deltaTime;
@@ -389,7 +371,6 @@ public class BusController : MonoBehaviour
         }
         else
         {
-            // Handle cooldown
             if (currentBoostCooldown > 0f)
             {
                 currentBoostCooldown -= Time.deltaTime;
@@ -403,39 +384,25 @@ public class BusController : MonoBehaviour
         currentBoostTime = boostDuration;
         currentBoostCooldown = boostCooldown;
 
-        if (boostTrail != null)
-        {
-            boostTrail.Play();
-        }
-        if (boostAudio != null)
-        {
-            boostAudio.Play();
-        }
+        if (boostTrail != null) boostTrail.Play();
+        if (boostAudio != null) boostAudio.Play();
     }
 
     void DeactivateBoost()
     {
         isBoosting = false;
 
-        if (boostTrail != null)
-        {
-            boostTrail.Stop();
-        }
-        if (boostAudio != null)
-        {
-            boostAudio.Stop();
-        }
+        if (boostTrail != null) boostTrail.Stop();
+        if (boostAudio != null) boostAudio.Stop();
     }
 
     void HandleDriftInput()
     {
         isDrifting = Input.GetKey(KeyCode.Space);
 
-        // Apply different traction based on drift state
         SetDriftTraction(wheelColliderRL, isDrifting);
         SetDriftTraction(wheelColliderRR, isDrifting);
 
-        // Handle drift smoke effects
         HandleDriftSmoke();
     }
 
@@ -463,31 +430,18 @@ public class BusController : MonoBehaviour
 
     void HandleDriftSmoke()
     {
-        // Only emit smoke when actually sliding (speed > threshold and drifting)
         bool shouldEmit = isDrifting && speed > 10f;
 
         if (driftSmokeL != null)
         {
-            if (shouldEmit && !driftSmokeL.isPlaying)
-            {
-                driftSmokeL.Play();
-            }
-            else if (!shouldEmit && driftSmokeL.isPlaying)
-            {
-                driftSmokeL.Stop();
-            }
+            if (shouldEmit && !driftSmokeL.isPlaying) driftSmokeL.Play();
+            else if (!shouldEmit && driftSmokeL.isPlaying) driftSmokeL.Stop();
         }
 
         if (driftSmokeR != null)
         {
-            if (shouldEmit && !driftSmokeR.isPlaying)
-            {
-                driftSmokeR.Play();
-            }
-            else if (!shouldEmit && driftSmokeR.isPlaying)
-            {
-                driftSmokeR.Stop();
-            }
+            if (shouldEmit && !driftSmokeR.isPlaying) driftSmokeR.Play();
+            else if (!shouldEmit && driftSmokeR.isPlaying) driftSmokeR.Stop();
         }
     }
 
@@ -496,37 +450,25 @@ public class BusController : MonoBehaviour
         if (engineAudio == null) return;
 
         float speedRatio = Mathf.Clamp01(speed / maxSpeed);
-        
-        // Calculate target pitch based on speed
         float targetPitch = 0.5f + speedRatio * 1.2f;
         
-        // Increase pitch during boost
         if (isBoosting)
         {
             targetPitch += 0.3f;
         }
 
-        // Apply pitch and volume
         engineAudio.pitch = Mathf.Clamp(targetPitch, 0.5f, 2f);
         engineAudio.volume = Mathf.Lerp(0.4f, 1f, speedRatio);
 
-        // Turbo audio - only during boost at high speed
         if (turboAudio != null)
         {
             bool shouldPlayTurbo = speed > 60f && isBoosting;
             
-            if (shouldPlayTurbo && !turboAudio.isPlaying)
-            {
-                turboAudio.Play();
-            }
-            else if (!shouldPlayTurbo && turboAudio.isPlaying)
-            {
-                turboAudio.Stop();
-            }
+            if (shouldPlayTurbo && !turboAudio.isPlaying) turboAudio.Play();
+            else if (!shouldPlayTurbo && turboAudio.isPlaying) turboAudio.Stop();
         }
     }
 
-    // Reset friction values when disabled
     void OnDisable()
     {
         if (wheelColliderRL != null)
@@ -541,14 +483,46 @@ public class BusController : MonoBehaviour
         }
     }
 
-    void CheckForCrash()
+    // --- ACCURATE COLLISION LOGIC ---
+    void OnCollisionEnter(Collision collision)
     {
-        if (speedHistory.Count >= maxSpeedHistory)
+        if (collision == null || impactCooldownTimer > 0f) return;
+
+        // Calculate impact force using collision impulse
+        float impactForce = collision.impulse.magnitude / Time.fixedDeltaTime;
+
+        // Ignore minor touches, driving over bumps, and soft landings
+        if (impactForce < minCrashForceThreshold) return;
+
+        impactCooldownTimer = impactCooldown;
+        PlayImpactSound(impactForce);
+    }
+
+    void PlayImpactSound(float force)
+    {
+        AudioSource impactAudio = null;
+
+        if (force >= heavyCrashForceThreshold)
         {
-            speedHistory.RemoveAt(0);
+            impactAudio = heavyDamageAudio;
+        }
+        else if (force >= mediumCrashForceThreshold)
+        {
+            impactAudio = mediumDamageAudio;
+        }
+        else
+        {
+            impactAudio = lightDamageAudio;
         }
 
-        speedHistory.Add(speed);
+        if (impactAudio == null) return;
+
+        if (impactAudio.isPlaying)
+        {
+            impactAudio.Stop();
+        }
+
+        impactAudio.Play();
     }
 
     IEnumerator PerformTrick(Vector3 axis)
@@ -583,7 +557,6 @@ public class BusController : MonoBehaviour
         }
 
         currentTrickRotation = 360f;
-
         isTricking = false;
 
         if (trickComboCountdown > 0f)
@@ -637,7 +610,7 @@ public class BusController : MonoBehaviour
 
     void HandleTricking()
     {
-        if(IsGrounded())
+        if (IsGrounded())
         {
             return;
         }
@@ -645,13 +618,11 @@ public class BusController : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.I))
             {
-                // rotate bus 360 on its local z axis
                 StartTrick(Vector3.forward);
             }
 
             if (Input.GetKeyDown(KeyCode.O))
             {
-                // rotate bus 360 on its local y axis
                 StartTrick(Vector3.up);
             }
         }        

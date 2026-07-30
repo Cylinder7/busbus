@@ -106,7 +106,7 @@ public class BusController : MonoBehaviour
     private float trickComboTimeWindow = 3f;
     private float trickComboCountdown = 0f;
     private bool isTricking;
-    private bool isTrickBoost;
+    private bool hasPendingPerfectLandingBoost;
     private Coroutine trickCoroutine;
     private float currentTrickRotation = 0f;
 
@@ -207,6 +207,7 @@ public class BusController : MonoBehaviour
             rb.transform.rotation = OriginalRotation;
             trickCombo=0;
             trickScore = 0f;
+            hasPendingPerfectLandingBoost = false;
             winUI.HideUI();
         }
     }
@@ -522,9 +523,24 @@ public class BusController : MonoBehaviour
                 {
                     landSuccessAudio.Play();
                 }
+
+                if (hasPendingPerfectLandingBoost && currentBoostCooldown <= 0f && !isBoosting)
+                {
+                    ActivateBoost();
+                }
+
+                hasPendingPerfectLandingBoost = false;
                 trickScore*=2;
                 Debug.Log("Perfect landing!");
             }
+            else
+            {
+                hasPendingPerfectLandingBoost = false;
+            }
+        }
+        else
+        {
+            hasPendingPerfectLandingBoost = false;
         }
 
         wasAirborne = false;
@@ -560,24 +576,13 @@ public class BusController : MonoBehaviour
     IEnumerator PerformTrick(Vector3 axis)
     {
         isTricking = true;
-        bool startedBoost = false;
-
-        if (!isBoosting)
-        {
-            ActivateBoost();
-            isTrickBoost = true;
-            startedBoost = true;
-        }
-        else
-        {
-            isTrickBoost = false;
-        }
+        hasPendingPerfectLandingBoost = true;
 
         currentTrickRotation = 0f;
-        while (currentTrickRotation < 360f - 0.001f)
+        while (currentTrickRotation < 450f - 0.001f)
         {
             float deltaRotation = trickRotationSpeed * Time.deltaTime;
-            float rotationRemaining = 360f - currentTrickRotation;
+            float rotationRemaining = 450f - currentTrickRotation;
             if (deltaRotation > rotationRemaining)
             {
                 deltaRotation = rotationRemaining;
@@ -605,14 +610,8 @@ public class BusController : MonoBehaviour
         trickComboCountdown = trickComboTimeWindow;
         
         PlayTrickComboSound(trickCombo);
-
-        if (isTrickBoost && startedBoost)
-        {
-            isTrickBoost = false;
-            DeactivateBoost();
-            trickScore += trickCombo*10;
-            trickScore = Math.Floor(trickScore);
-        }
+        trickScore += trickCombo*10;
+        trickScore = Math.Floor(trickScore);
     }
 
     void PlayTrickComboSound(int comboCount)

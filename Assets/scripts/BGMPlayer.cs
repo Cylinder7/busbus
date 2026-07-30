@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class BGMPlayer : MonoBehaviour
 {
+    private const float V = 0.5f;
     public AudioClip[] musicTracks;
     private AudioSource audioSource;
 
@@ -25,6 +26,7 @@ public class BGMPlayer : MonoBehaviour
 
         int randomIndex = Random.Range(0, musicTracks.Length);
         audioSource.clip = musicTracks[randomIndex];
+        audioSource.volume = V;
         audioSource.Play();
     }
 }
